@@ -129,14 +129,11 @@
     .insta-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      grid-auto-rows: calc((100vw - 4 * var(--gap))/3);
       gap: var(--gap);
       padding: var(--gap);
     }
     @media (max-width: 480px) {
-      .insta-grid { 
-        grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: calc((100vw - 3 * var(--gap))/2);
+      .insta-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     /* Wrapper flash (cella + meta sotto) */
@@ -144,14 +141,13 @@
 
     .grid-item {
       position: relative;
+      aspect-ratio: 1 / 1;
       overflow: hidden;
       background: var(--surface);
       cursor: pointer;
       border-radius: 2px;
     }
     .grid-item img {
-      position: absolute;
-      inset: 0;
       width: 100%; height: 100%;
       object-fit: cover; display: block;
       transition: transform 0.4s ease, filter 0.3s ease;
@@ -169,8 +165,7 @@
     .grid-overlay svg { width: 26px; height: 26px; color: #fff; opacity: 0.9; }
 
     .grid-placeholder {
-      position: absolute;
-      inset: 0;
+      width: 100%; height: 100%;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 0.4rem;
       color: var(--border);
@@ -566,38 +561,64 @@
   ══════════════════════════════════════════════════════════════════
   -->
   <div class="insta-grid">
+
     <!-- ★ PIÙ RECENTE — metti sempre qui sopra -->
-
-    <div class="grid-item"
-         data-images="polipo-nobile-01.jpg,polipo-nobile-02.jpg,polipo-nobile-03.jpg,polipo-nobile-04.jpg,polipo-nobile-05.jpg"
-         data-caption="I polpi sono incredibili cefalopodi marini noti per avere tre cuori, sangue blu e otto braccia dotate di &quot;mini-cervelli&quot; autonomi, braccia, non tentacoli!&#10;Solitamente il terzo braccio destro è più corto, presenta una punta spatolata ed è chiamato ectocotile e sì, è il CATZO del polipo :)&#10;Sapevatelo!"
-         onclick="openLightbox(this)">
-      <img src="polipo-nobile-01.jpg" alt="polipo, mare, tattoo, tatuaggio, dotwork, parma">
-      <div class="grid-overlay"></div>
+    <div class="grid-item" id="baci-post" onclick="openLightbox(this)"
+         data-caption="Serie &quot;Baci&quot; — illustrazioni a puntinato, inchiostro su carta. Ispirate al cinema horror classico. Disponibili anche come sticker in edizione limitata.">
+      <img id="baci-thumb" src="" alt="Baci">
+      <div class="grid-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      </div>
     </div>
 
-    <div class="grid-item"
-         data-images="polipo-nobile-01.jpg,polipo-nobile-02.jpg,polipo-nobile-03.jpg,polipo-nobile-04.jpg,polipo-nobile-05.jpg"
-         data-caption="I polpi sono incredibili cefalopodi marini noti per avere tre cuori, sangue blu e otto braccia dotate di &quot;mini-cervelli&quot; autonomi, braccia, non tentacoli!&#10;Solitamente il terzo braccio destro è più corto, presenta una punta spatolata ed è chiamato ectocotile e sì, è il CATZO del polipo :)&#10;Sapevatelo!"
-         onclick="openLightbox(this)">
-      <img src="polipo-nobile-01.jpg" alt="polipo, mare, tattoo, tatuaggio, dotwork, parma">
-      <div class="grid-overlay"></div>
+    <div class="grid-item" data-images="foto2.jpg" onclick="openLightbox(this)">
+      <div class="grid-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        Foto 2
+      </div>
+      <div class="grid-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
     </div>
 
-    <div class="grid-item"
-         data-images="margherite-01.jpg,margherite-02.jpg,margherite-03.jpg,margherite-04.jpg"
-         data-caption="Giusto 2 cose interessanti sulle margherite 🌼:&#10;1. Alcune margherite muovono i loro fiori di giorno per seguire la luce, proprio come i girasoli.&#10;2. Nel linguaggio dei fiori, simboleggiano innocenza, purezza e amore fedele.&#10;3. Crescono spontanee in quasi tutti i continenti e in terreni poveri, resistendo a condizioni difficili.&#10;4. Si aprono e chiudono secondo un ritmo circadiano interno, anche se non c'è luce diretta.&#10;Sapevatelo!"
-         onclick="openLightbox(this)">
-      <img src="margherite-01.jpg" alt="Margherite, tattoo, tatuaggio, dotwork, parma”>
-      <div class="grid-overlay"></div>
+    <div class="grid-item" data-images="foto3.jpg,foto3b.jpg" onclick="openLightbox(this)">
+      <div class="grid-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        Foto 3
+      </div>
+      <div class="grid-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      </div>
     </div>
 
-    <div class="grid-item"
-         data-images="galeone-conchiglia-01.jpg,galeone-conchiglia-02.jpg,galeone-conchiglia-03.jpg,galeone-conchiglia-04.jpg,galeone-conchiglia-05.jpg"
-         data-caption="&quot;Dead men tell no tales.&quot;"
-         onclick="openLightbox(this)">
-      <img src="galeone-conchiglia-01.jpg" alt=“galeone, mare, tattoo, tatuaggio, dotwork, parma">
-      <div class="grid-overlay"></div>
+    <div class="grid-item" data-images="foto4.jpg" onclick="openLightbox(this)">
+      <div class="grid-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        Foto 4
+      </div>
+      <div class="grid-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
+    </div>
+
+    <div class="grid-item" data-images="foto5.jpg" onclick="openLightbox(this)">
+      <div class="grid-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        Foto 5
+      </div>
+      <div class="grid-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
+    </div>
+
+    <div class="grid-item" data-images="foto6.jpg" onclick="openLightbox(this)">
+      <div class="grid-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        Foto 6
+      </div>
+      <div class="grid-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
     </div>
 
   </div>
