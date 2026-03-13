@@ -874,23 +874,38 @@
   -->
   <div class="insta-grid">
 
-    <div class="grid-item" data-images="copertina-video-001.jpg" onclick="openLightbox(this)">
-      <div class="grid-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Video 1
-      </div>
-      <div class="grid-overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <div class="flash-wrap">
+      <a href="https://www.instagram.com/reel/DTC0hWdDACg/" target="_blank" class="grid-item">
+        
+        <img src="copertina-video-001.jpg" alt="Video Reel">
+    
+        <div class="grid-overlay">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+      </a>
+      <div class="flash-meta">
+        <span class="available-label">Guarda su Instagram</span>
       </div>
     </div>
 
-    <div class="grid-item" data-images="video2.jpg" onclick="openLightbox(this)">
-      <div class="grid-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Video 2
+    <div class="flash-wrap">
+      <div class="grid-item" 
+           data-images="copertina-video-001.jpg" 
+           data-caption="Video Reel — <a href='https://www.instagram.com/reel/DTC0hWdDACg/' target='_blank' style='color:var(--accent); text-decoration:underline;'>Clicca qui per vedere il video su Instagram</a>" 
+           onclick="openLightbox(this)">
+        
+        <img src="copertina-video-001.jpg" alt="Video 1">
+    
+        <div class="grid-overlay">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
       </div>
-      <div class="grid-overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <div class="flash-meta">
+        <span class="available-label">Video</span>
       </div>
     </div>
 
