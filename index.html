@@ -1136,19 +1136,26 @@
 
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  /* ── Navigazione ── */
-  function showPage(name) {
-    // --- NOVITÀ: Gestione ritorno a Lavori su Mobile ---
-    const activePage = document.querySelector('.page.visible');
-    const isCurrentlyLavori = activePage && activePage.id === 'page-lavori';
-    
-    // Se siamo su mobile, stiamo andando su una pagina diversa da lavori e veniamo da lavori:
-    if (window.innerWidth <= 768 && name !== 'lavori' && isCurrentlyLavori) {
-      history.pushState({ subPage: true }, "");
-    }
-    // ---------------------------------------------------
+/* ── VARIABILI GLOBALI ── */
+let lbImages = [];
+  let lbCurrent = 0;
+  let allPosts = Array.from(document.querySelectorAll('.grid-item'));
+  let postIndex = 0;
 
-    closeLightbox(); 
+  /* ── 1. NAVIGAZIONE TRA PAGINE (CON CRONOLOGIA) ── */
+  function showPage(name, addHistory = true) {
+    // Chiude il lightbox se è aperto quando si cambia pagina
+    const lb = document.getElementById('lightbox');
+    if (lb && lb.classList.contains('open')) {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    
+    // Chiude il menu mobile
+    const navLinks = document.getElementById('nav-links');
+    if(navLinks) navLinks.classList.remove('mobile-open');
+
+    // Cambia visibilità
     document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
     document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
     
@@ -1158,105 +1165,91 @@
     if(targetPage) targetPage.classList.add('visible');
     if(targetBtn)  targetBtn.classList.add('active');
 
-    const navLinks = document.getElementById('nav-links');
-    if(navLinks) navLinks.classList.remove('mobile-open');
-
     window.scrollTo({ top: 0 });
+
+    // Registra il movimento nella cronologia
+    if (addHistory) {
+      history.pushState({ page: name }, "");
+    }
   }
 
-  // NUOVA FUNZIONE PER IL QUADRATINO GRIGIO (MENU MOBILE)
+  /* ── 2. GESTIONE MENU MOBILE ── */
   function toggleMenu() {
     const navLinks = document.getElementById('nav-links');
     if(navLinks) navLinks.classList.toggle('mobile-open');
   }
 
-  /* ── Lightbox + navigazione tra POST ── */
-  let lbImages   = [];
-  let lbCurrent  = 0;
-  let allPosts   = [];   
-  let postIndex  = 0;   
-
+  /* ── 3. GESTIONE LIGHTBOX (CON CRONOLOGIA) ── */
   function openLightbox(el) {
-    const activePage = document.querySelector('.page.visible');
-    allPosts = Array.from(activePage.querySelectorAll('.grid-item[onclick]'));
     postIndex = allPosts.indexOf(el);
-
     loadPost(el);
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
 
-    // GESTIONE TASTO INDIETRO: Crea un "punto di ritorno" nella cronologia
+    // Crea un punto di ritorno specifico per la foto aperta
     history.pushState({ lbOpen: true }, "");
   }
 
   function closeLightbox() {
     const lb = document.getElementById('lightbox');
     if (lb.classList.contains('open')) {
-        lb.classList.remove('open');
-        document.body.style.overflow = '';
-        
-        // Se l'utente chiude con la "X", rimuoviamo lo stato dalla cronologia
-        if (history.state && history.state.lbOpen) {
-            history.back();
-        }
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+      // Se chiudiamo con la X, torniamo indietro nella cronologia del browser
+      if (history.state && history.state.lbOpen) {
+        history.back();
+      }
     }
   }
 
-  // EVENTO TASTO INDIETRO DEL TELEFONO//
-  window.addEventListener('popstate', function(event) {
-    const lb = document.getElementById('lightbox');
-    
-    // 1. Se il lightbox è aperto, chiudilo (priorità)
-    if (lb && lb.classList.contains('open')) {
-        lb.classList.remove('open');
-        document.body.style.overflow = '';
-        return;
-    }
-
-    // 2. Se siamo su mobile e non siamo nella pagina lavori, tornaci
-    if (window.innerWidth <= 768) {
-      const activePage = document.querySelector('.page.visible');
-      if (activePage && activePage.id !== 'page-lavori') {
-          // Eseguiamo un cambio pagina "pulito" verso lavori
-          document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
-          document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
-          document.getElementById('page-lavori').classList.add('visible');
-          document.getElementById('btn-lavori').classList.add('active');
-          window.scrollTo({ top: 0 });
-      }
-    }
-  });
-
   function loadPost(el) {
-    // Immagini
-    const b64raw = el.getAttribute('data-images-b64');
-    if (b64raw) {
-      lbImages = JSON.parse(b64raw);
-    } else {
-      const raw = el.getAttribute('data-images') || '';
-      lbImages = raw.split(',').map(s => s.trim()).filter(Boolean);
-    }
+    const raw = el.getAttribute('data-images') || '';
+    lbImages = raw.split(',').map(s => s.trim()).filter(Boolean);
     lbCurrent = 0;
     if (!lbImages.length) return;
 
-    // Caption
     document.getElementById('lb-caption').innerHTML = el.getAttribute('data-caption') || '';
-
     buildDots();
     lbShow();
 
-    // Frecce esterne: nascondi se un solo post
+    // Mostra/nascondi frecce post se ce n'è solo uno
     document.getElementById('lb-post-prev').style.display = allPosts.length > 1 ? '' : 'none';
     document.getElementById('lb-post-next').style.display = allPosts.length > 1 ? '' : 'none';
   }
 
-  // Scorre tra i POST (frecce esterne)
+  /* ── 4. IL "CERVELLO" DELLA CRONOLOGIA (POPSTATE) ── */
+  // Inizializza lo stato appena la pagina è pronta
+  window.addEventListener('load', () => {
+    if (!history.state) {
+      history.replaceState({ page: 'lavori' }, "");
+    }
+  });
+
+  // Reagisce al tasto "Indietro"
+  window.addEventListener('popstate', function(event) {
+    const lb = document.getElementById('lightbox');
+    
+    // Se stiamo tornando indietro e il lightbox è aperto, lo chiudiamo
+    if (lb && lb.classList.contains('open')) {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+      return; 
+    }
+
+    // Se stiamo tornando indietro tra le sezioni (Lavori, Flash, etc.)
+    if (event.state && event.state.page) {
+      showPage(event.state.page, false);
+    } else {
+      showPage('lavori', false);
+    }
+  });
+
+  /* ── 5. FUNZIONI DI SUPPORTO (SCORRIMENTO FOTO) ── */
   function postStep(dir) {
     postIndex = (postIndex + dir + allPosts.length) % allPosts.length;
     loadPost(allPosts[postIndex]);
   }
 
-  // Scorre tra le IMMAGINI del post (frecce interne)
   function lbStep(dir) {
     lbCurrent = (lbCurrent + dir + lbImages.length) % lbImages.length;
     lbShow();
@@ -1271,9 +1264,7 @@
     const showArrows = lbImages.length > 1;
     document.querySelector('.lb-prev').style.display = showArrows ? '' : 'none';
     document.querySelector('.lb-next').style.display = showArrows ? '' : 'none';
-
-    document.querySelectorAll('.lb-dot').forEach((d, i) =>
-      d.classList.toggle('active', i === lbCurrent));
+    document.querySelectorAll('.lb-dot').forEach((d, i) => d.classList.toggle('active', i === lbCurrent));
   }
 
   function buildDots() {
@@ -1288,24 +1279,23 @@
     });
   }
 
-  /* ── Swipe touch: immagini interne ── */
+  /* ── 6. CONTROLLI TOUCH E TASTIERA ── */
   let touchStartX = 0;
   document.getElementById('lb-main').addEventListener('touchstart', e => {
     touchStartX = e.touches[0].clientX;
   }, { passive: true });
+
   document.getElementById('lb-main').addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
     if (Math.abs(dx) > 40) lbStep(dx < 0 ? 1 : -1);
   });
 
-  /* ── Tastiera ── */
   document.addEventListener('keydown', e => {
     if (!document.getElementById('lightbox').classList.contains('open')) return;
-    if (e.key === 'Escape')     closeLightbox();
+    if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowRight') lbStep(1);
-    if (e.key === 'ArrowLeft')  lbStep(-1);
+    if (e.key === 'ArrowLeft') lbStep(-1);
   });
-
 </script>
 
 <script id="img-data">
