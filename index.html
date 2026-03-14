@@ -481,6 +481,70 @@
       text-transform: uppercase; color: var(--muted);
     }
     @media (max-width: 480px) { footer { flex-direction: column; gap: 0.4rem; text-align: center; } }
+    
+    /* --- OTTIMIZZAZIONE HEADER MOBILE --- */
+    @media (max-width: 768px) {
+
+      /* Tasto Hamburger (le 3 linee) */
+      .menu-toggle {
+        display: block; /* Visibile solo su mobile */
+        background: none;
+        border: 1px solid var(--muted);
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      .menu-toggle span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: var(--muted);
+        margin: 4px 0;
+        transition: 0.3s;
+      }
+
+      /* Menu a tendina */
+      .nav-links {
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        max-height: 0; /* Chiuso di default */
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+        z-index: 1000;
+        flex-direction: column;
+        gap: 0;
+        padding: 0;
+      }
+
+      .nav-links.open {
+        max-height: 350px; /* Si apre quando clicchi */
+        padding: 1rem 0;
+      }
+
+      .nav-links li {
+        text-align: center;
+      }
+
+      .nav-links button {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+      }
+}
+
+/* Nasconde il tasto hamburger su Desktop */
+    @media (min-width: 769px) {
+      .menu-toggle {
+        display: none;
+      }
+    }
 
   </style>
 </head>
@@ -493,7 +557,10 @@
          onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block'">
     <span class="logo-fallback" style="display:none">Il Tuo Logo</span>
   </div>
-  <ul class="nav-links">
+  <button class="menu-toggle" onclick="toggleMenu(event)" aria-label="Apri menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="mainNav">
     <li><button onclick="showPage('lavori')" id="btn-lavori" class="active">Lavori</button></li>
     <li><button onclick="showPage('flash')"  id="btn-flash">Flash</button></li>
     <li><button onclick="showPage('video')"  id="btn-video">Video</button></li>
@@ -1093,13 +1160,19 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   /* ── Navigazione ── */
-  function showPage(name) {
-    closeLightbox(); // ← chiude l'anteprima se aperta
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
-    document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('visible');
-    document.getElementById('btn-' + name).classList.add('active');
-    window.scrollTo({ top: 0 });
+  function toggleMenu(e) {
+  e.stopPropagation();
+  document.getElementById('mainNav').classList.toggle('open');
+}
+
+// Chiude il menu se clicchi fuori (ovunque nel body)
+document.addEventListener('click', function(e) {
+  const nav = document.getElementById('mainNav');
+  const toggle = document.querySelector('.menu-toggle');
+  if (nav.classList.contains('open') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+    nav.classList.remove('open');
+  }
+});
   }
 
   /* ── Lightbox + navigazione tra POST ── */
