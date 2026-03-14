@@ -202,7 +202,55 @@
       display: none; align-items: center; justify-content: center;
     }
     .lightbox.open { display: flex; }
+    /* --- LIGHTBOX (Aggiornato per effetto Instagram) --- */
+    #lightbox {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      z-index: 2000;
+      flex-direction: column;
+    }
+    #lightbox.open { display: flex; }
 
+/* --- LIGHTBOX OTTIMIZZATO --- */
+    #lb-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column; 
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      padding: 40px 0;
+      
+      /* EFFETTO CALAMITA (SNAP) */
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch; /* Per fluidità su iPhone */
+    }
+
+    .lb-content {
+      background: var(--surface);
+      width: 95%;
+      max-width: 500px;
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      
+      /* AGGANCIO AL CENTRO */
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      margin-bottom: 50px; 
+    }
+      
+      /* AGGANCIO AL CENTRO */
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      margin-bottom: 50px; /* Spazio tra un post e l'altro durante lo scroll */
+    }
     /* Pannello: immagine a sinistra + sidebar testo a destra */
     .lb-panel {
       background: var(--lb-bg);
@@ -1206,6 +1254,11 @@ let lbImages = [];
     if (!allPosts.length) return;
     postIndex = (postIndex + dir + allPosts.length) % allPosts.length;
     loadPost(allPosts[postIndex]);
+
+    document.getElementById('lb-main').scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
 
   function lbStep(dir) {
