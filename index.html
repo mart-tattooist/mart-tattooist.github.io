@@ -1137,8 +1137,17 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   /* ── Navigazione ── */
-  /* ── Navigazione ── */
   function showPage(name) {
+    // --- NOVITÀ: Gestione ritorno a Lavori su Mobile ---
+    const activePage = document.querySelector('.page.visible');
+    const isCurrentlyLavori = activePage && activePage.id === 'page-lavori';
+    
+    // Se siamo su mobile, stiamo andando su una pagina diversa da lavori e veniamo da lavori:
+    if (window.innerWidth <= 768 && name !== 'lavori' && isCurrentlyLavori) {
+      history.pushState({ subPage: true }, "");
+    }
+    // ---------------------------------------------------
+
     closeLightbox(); 
     document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
     document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
@@ -1149,7 +1158,6 @@
     if(targetPage) targetPage.classList.add('visible');
     if(targetBtn)  targetBtn.classList.add('active');
 
-    // CHIUDE IL MENU SU MOBILE DOPO IL CLICK
     const navLinks = document.getElementById('nav-links');
     if(navLinks) navLinks.classList.remove('mobile-open');
 
@@ -1194,13 +1202,28 @@
     }
   }
 
-  // EVENTO TASTO INDIETRO DEL TELEFONO
+  // EVENTO TASTO INDIETRO DEL TELEFONO//
   window.addEventListener('popstate', function(event) {
     const lb = document.getElementById('lightbox');
-    // Se il lightbox è aperto, lo chiudiamo invece di cambiare pagina
+    
+    // 1. Se il lightbox è aperto, chiudilo (priorità)
     if (lb && lb.classList.contains('open')) {
         lb.classList.remove('open');
         document.body.style.overflow = '';
+        return;
+    }
+
+    // 2. Se siamo su mobile e non siamo nella pagina lavori, tornaci
+    if (window.innerWidth <= 768) {
+      const activePage = document.querySelector('.page.visible');
+      if (activePage && activePage.id !== 'page-lavori') {
+          // Eseguiamo un cambio pagina "pulito" verso lavori
+          document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
+          document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+          document.getElementById('page-lavori').classList.add('visible');
+          document.getElementById('btn-lavori').classList.add('active');
+          window.scrollTo({ top: 0 });
+      }
     }
   });
 
