@@ -1203,11 +1203,13 @@ let lbImages = [];
   }
 
   function postStep(dir) {
+    if (!allPosts.length) return;
     postIndex = (postIndex + dir + allPosts.length) % allPosts.length;
     loadPost(allPosts[postIndex]);
   }
 
   function lbStep(dir) {
+    if (!lbImages.length) return;
     lbCurrent = (lbCurrent + dir + lbImages.length) % lbImages.length;
     lbShow();
   }
@@ -1235,7 +1237,7 @@ let lbImages = [];
     });
   }
 
-  /* ── 4. EVENTI ── */
+  /* ── 4. EVENTI (INDIETRO, CLICK FUORI) ── */
   window.addEventListener('load', () => {
     if (!history.state) history.replaceState({ page: 'lavori' }, "");
   });
@@ -1266,10 +1268,12 @@ let lbImages = [];
   document.getElementById('lb-main').addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
     const dy = e.changedTouches[0].clientY - touchStartY;
+    const threshold = 50;
+
     if (Math.abs(dx) > Math.abs(dy)) {
-      if (Math.abs(dx) > 50) lbStep(dx < 0 ? 1 : -1);
+      if (Math.abs(dx) > threshold) lbStep(dx < 0 ? 1 : -1);
     } else {
-      if (Math.abs(dy) > 50) postStep(dy < 0 ? 1 : -1);
+      if (Math.abs(dy) > threshold) postStep(dy < 0 ? 1 : -1);
     }
   });
 
