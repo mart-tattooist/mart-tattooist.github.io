@@ -482,6 +482,44 @@
     }
     @media (max-width: 480px) { footer { flex-direction: column; gap: 0.4rem; text-align: center; } }
 
+    /* ──────── FOOTER ──────── */
+    
+    footer {
+      padding: 1.6rem 2.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.68rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    @media (max-width: 480px) { footer { flex-direction: column; gap: 0.4rem; text-align: center; } }
+   
+    /* --- MODIFICHE MOBILE --- */
+    @media (max-width: 768px) {
+      nav { padding: 0 1.2rem; }
+      .nav-logo img { max-height: 28px; } /* Logo più piccolo */
+  
+      .menu-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 28px; height: 22px;
+       background: none; border: none; cursor: pointer;
+      }
+      .menu-toggle span {
+        display: block; height: 2px; width: 100%;
+        background: #888; /* Grigio chiaro come richiesto */
+        transition: 0.3s;
+      }
+
+      .nav-links {
+        display: none; /* Nasconde il menu di default */
+        position: absolute; top: 64px; left: 0; right: 0;
+        background: var(--bg); flex-direction: column;
+        padding: 1rem 0; border-bottom: 1px solid var(--border);
+      }
+      .nav-links.mobile-open { display: flex; } /* Mostra al clic */
+      .nav-links button { width: 100%; padding: 1.2rem 2rem; text-align: left; }
+    }
   </style>
 </head>
 <body>
@@ -489,15 +527,21 @@
 <!-- ═══════════ NAVBAR ═══════════ -->
 <nav>
   <div class="nav-logo" onclick="showPage('lavori')">
-    <img src="logo.png" alt="Logo"
-         onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block'">
-    <span class="logo-fallback" style="display:none">Il Tuo Logo</span>
+    <img src="logo.png" alt="Logo" onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block'">
+    <span class="logo-fallback" style="display:none">MART</span>
   </div>
-  <ul class="nav-links">
+  
+  <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <ul class="nav-links" id="nav-links">
     <li><button onclick="showPage('lavori')" id="btn-lavori" class="active">Lavori</button></li>
     <li><button onclick="showPage('flash')"  id="btn-flash">Flash</button></li>
     <li><button onclick="showPage('video')"  id="btn-video">Video</button></li>
-    <li><button onclick="showPage('about')"  id="btn-about">About</button></li>
+    <li><button onclick="showPage('about')"  id="btn-about">Contatti</button></li>
   </ul>
 </nav>
 
@@ -1093,23 +1137,38 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   /* ── Navigazione ── */
+  /* ── Navigazione ── */
   function showPage(name) {
-    closeLightbox(); // ← chiude l'anteprima se aperta
+    closeLightbox(); 
     document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
     document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('visible');
-    document.getElementById('btn-' + name).classList.add('active');
+    
+    const targetPage = document.getElementById('page-' + name);
+    const targetBtn  = document.getElementById('btn-' + name);
+    
+    if(targetPage) targetPage.classList.add('visible');
+    if(targetBtn)  targetBtn.classList.add('active');
+
+    // CHIUDE IL MENU SU MOBILE DOPO IL CLICK
+    const navLinks = document.getElementById('nav-links');
+    if(navLinks) navLinks.classList.remove('mobile-open');
+
     window.scrollTo({ top: 0 });
+  }
+
+  // NUOVA FUNZIONE PER IL QUADRATINO GRIGIO (MENU MOBILE)
+  function toggleMenu() {
+    const navLinks = document.getElementById('nav-links');
+    if(navLinks) navLinks.classList.toggle('mobile-open');
   }
 
   /* ── Lightbox + navigazione tra POST ── */
   let lbImages   = [];
   let lbCurrent  = 0;
-  let allPosts   = [];   // lista di tutti i grid-item della pagina corrente
-  let postIndex  = 0;   // indice del post aperto
+  let allPosts   = [];   
+  let postIndex  = 0;   
 
   function openLightbox(el) {
-    // Raccoglie tutti i grid-item della pagina visibile
     const activePage = document.querySelector('.page.visible');
     allPosts = Array.from(activePage.querySelectorAll('.grid-item[onclick]'));
     postIndex = allPosts.indexOf(el);
@@ -1117,7 +1176,33 @@
     loadPost(el);
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    // GESTIONE TASTO INDIETRO: Crea un "punto di ritorno" nella cronologia
+    history.pushState({ lbOpen: true }, "");
   }
+
+  function closeLightbox() {
+    const lb = document.getElementById('lightbox');
+    if (lb.classList.contains('open')) {
+        lb.classList.remove('open');
+        document.body.style.overflow = '';
+        
+        // Se l'utente chiude con la "X", rimuoviamo lo stato dalla cronologia
+        if (history.state && history.state.lbOpen) {
+            history.back();
+        }
+    }
+  }
+
+  // EVENTO TASTO INDIETRO DEL TELEFONO
+  window.addEventListener('popstate', function(event) {
+    const lb = document.getElementById('lightbox');
+    // Se il lightbox è aperto, lo chiudiamo invece di cambiare pagina
+    if (lb && lb.classList.contains('open')) {
+        lb.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+  });
 
   function loadPost(el) {
     // Immagini
@@ -1146,11 +1231,6 @@
   function postStep(dir) {
     postIndex = (postIndex + dir + allPosts.length) % allPosts.length;
     loadPost(allPosts[postIndex]);
-  }
-
-  function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('open');
-    document.body.style.overflow = '';
   }
 
   // Scorre tra le IMMAGINI del post (frecce interne)
