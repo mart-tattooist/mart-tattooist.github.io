@@ -1139,23 +1139,20 @@
 /* ── VARIABILI GLOBALI ── */
 let lbImages = [];
   let lbCurrent = 0;
-  let allPosts = Array.from(document.querySelectorAll('.grid-item'));
+  let allPosts = [];   // Verrà popolata dinamicamente in base alla pagina visibile
   let postIndex = 0;
 
   /* ── 1. NAVIGAZIONE TRA PAGINE (CON CRONOLOGIA) ── */
   function showPage(name, addHistory = true) {
-    // Chiude il lightbox se è aperto quando si cambia pagina
     const lb = document.getElementById('lightbox');
     if (lb && lb.classList.contains('open')) {
       lb.classList.remove('open');
       document.body.style.overflow = '';
     }
     
-    // Chiude il menu mobile
     const navLinks = document.getElementById('nav-links');
     if(navLinks) navLinks.classList.remove('mobile-open');
 
-    // Cambia visibilità
     document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
     document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
     
@@ -1167,7 +1164,6 @@ let lbImages = [];
 
     window.scrollTo({ top: 0 });
 
-    // Registra il movimento nella cronologia
     if (addHistory) {
       history.pushState({ page: name }, "");
     }
@@ -1179,14 +1175,17 @@ let lbImages = [];
     if(navLinks) navLinks.classList.toggle('mobile-open');
   }
 
-  /* ── 3. GESTIONE LIGHTBOX (CON CRONOLOGIA) ── */
+  /* ── 3. GESTIONE LIGHTBOX (CON CRONOLOGIA E SCORRIMENTO VERTICALE) ── */
   function openLightbox(el) {
+    // IMPORTANTE: Aggiorna la lista dei post in base alla pagina in cui ti trovi
+    const activePage = document.querySelector('.page.visible');
+    allPosts = Array.from(activePage.querySelectorAll('.grid-item[onclick]'));
     postIndex = allPosts.indexOf(el);
+
     loadPost(el);
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
 
-    // Crea un punto di ritorno specifico per la foto aperta
     history.pushState({ lbOpen: true }, "");
   }
 
@@ -1195,7 +1194,6 @@ let lbImages = [];
     if (lb.classList.contains('open')) {
       lb.classList.remove('open');
       document.body.style.overflow = '';
-      // Se chiudiamo con la X, torniamo indietro nella cronologia del browser
       if (history.state && history.state.lbOpen) {
         history.back();
       }
@@ -1212,39 +1210,10 @@ let lbImages = [];
     buildDots();
     lbShow();
 
-    // Mostra/nascondi frecce post se ce n'è solo uno
     document.getElementById('lb-post-prev').style.display = allPosts.length > 1 ? '' : 'none';
     document.getElementById('lb-post-next').style.display = allPosts.length > 1 ? '' : 'none';
   }
 
-  /* ── 4. IL "CERVELLO" DELLA CRONOLOGIA (POPSTATE) ── */
-  // Inizializza lo stato appena la pagina è pronta
-  window.addEventListener('load', () => {
-    if (!history.state) {
-      history.replaceState({ page: 'lavori' }, "");
-    }
-  });
-
-  // Reagisce al tasto "Indietro"
-  window.addEventListener('popstate', function(event) {
-    const lb = document.getElementById('lightbox');
-    
-    // Se stiamo tornando indietro e il lightbox è aperto, lo chiudiamo
-    if (lb && lb.classList.contains('open')) {
-      lb.classList.remove('open');
-      document.body.style.overflow = '';
-      return; 
-    }
-
-    // Se stiamo tornando indietro tra le sezioni (Lavori, Flash, etc.)
-    if (event.state && event.state.page) {
-      showPage(event.state.page, false);
-    } else {
-      showPage('lavori', false);
-    }
-  });
-
-  /* ── 5. FUNZIONI DI SUPPORTO (SCORRIMENTO FOTO) ── */
   function postStep(dir) {
     postIndex = (postIndex + dir + allPosts.length) % allPosts.length;
     loadPost(allPosts[postIndex]);
@@ -1279,9 +1248,37 @@ let lbImages = [];
     });
   }
 
-  /* ── 6. CHIUSURA CLICCANDO FUORI ── */
-  // Se clicchi sullo sfondo grigio (lb-main) e non sulla scheda, chiude.
+  /* ── 4. GESTIONE CRONOLOGIA (POPSTATE) ── */
+  window.addEventListener('load', () => {
+    if (!history.state) {
+      history.replaceState({ page: 'lavori' }, "");
+    }
+  });
+
+  window.addEventListener('popstate', function(event) {
+    const lb = document.getElementById('lightbox');
+    if (lb && lb.classList.contains('open')) {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+      return; 
+    }
+    if (event.state && event.state.page) {
+      showPage(event.state.page, false);
+    } else {
+      showPage('lavori', false);
+    }
+  });
+
+  /* ── 5. CHIUSURA CLICCANDO SULL'AREA GRIGIA ── */
   document.getElementById('lb-main').addEventListener('click', function(e) {
+    // Se clicchi proprio su lb-main (lo sfondo) e non sui suoi figli (immagine/testo)
+    if (e.target === this) {
+      closeLightbox();
+    }
+  });
+
+/* ── 6. CHIUSURA CLICCANDO FUORI ── */
+document.getElementById('lb-main').addEventListener('click', function(e) {
     if (e.target === this) {
       closeLightbox();
     }
@@ -1299,21 +1296,14 @@ let lbImages = [];
   document.getElementById('lb-main').addEventListener('touchend', e => {
     const deltaX = e.changedTouches[0].clientX - touchStartX;
     const deltaY = e.changedTouches[0].clientY - touchStartY;
-    
-    // Sensibilità: almeno 50px di movimento
     const threshold = 50;
 
-    // Determina se lo swipe è più orizzontale o verticale
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      // SWIPE ORIZZONTALE: Scorre le foto interne al post
       if (Math.abs(deltaX) > threshold) {
         lbStep(deltaX < 0 ? 1 : -1);
       }
     } else {
-      // SWIPE VERTICALE: Passa al post successivo/precedente (Stile Instagram)
       if (Math.abs(deltaY) > threshold) {
-        // Swipe verso l'alto (deltaY negativo) -> Post Successivo
-        // Swipe verso il basso (deltaY positivo) -> Post Precedente
         postStep(deltaY < 0 ? 1 : -1);
       }
     }
@@ -1322,14 +1312,9 @@ let lbImages = [];
   /* ── 8. TASTIERA ── */
   document.addEventListener('keydown', e => {
     if (!document.getElementById('lightbox').classList.contains('open')) return;
-    
     if (e.key === 'Escape') closeLightbox();
-    
-    // Frecce Orizzontali: Foto interne
     if (e.key === 'ArrowRight') lbStep(1);
     if (e.key === 'ArrowLeft') lbStep(-1);
-    
-    // Frecce Verticali: Post successivi
     if (e.key === 'ArrowUp') postStep(-1);
     if (e.key === 'ArrowDown') postStep(1);
   });
