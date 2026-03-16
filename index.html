@@ -126,26 +126,14 @@
     .link-hidden:hover { color: var(--text); }
 
     /* ──────── GRIGLIA 3 COLONNE con gap 1.2rem ──────── */
-    /* --- Modifica questa sezione nel tuo CSS --- */
     .insta-grid {
-      display: flex; /* Cambiato da grid a flex per l'orizzontale */
-      overflow-x: auto; /* Abilita lo scorrimento orizzontale */
-      scroll-snap-type: x mandatory; /* Effetto calamita Instagram */
-      scroll-behavior: smooth;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: var(--gap);
       padding: var(--gap);
-      -webkit-overflow-scrolling: touch; /* Fluidità su iPhone */
     }
-
-    /* Nascondi la barra di scorrimento per un look pulito */
-    .insta-grid::-webkit-scrollbar {
-      display: none;
-    }
-
-    /* Assicurati che gli elementi mantengano la loro dimensione */
-    .grid-item, .flash-wrap {
-      flex: 0 0 85%; /* Ogni post occupa l'85% della larghezza schermo */
-      scroll-snap-align: center; /* Centra il post durante lo scorrimento */
+    @media (max-width: 480px) {
+      .insta-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     /* Wrapper flash (cella + meta sotto) */
@@ -542,6 +530,12 @@
     <img src="logo.png" alt="Logo" onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block'">
     <span class="logo-fallback" style="display:none">MART</span>
   </div>
+  
+  <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
 
   <ul class="nav-links" id="nav-links">
     <li><button onclick="showPage('lavori')" id="btn-lavori" class="active">Lavori</button></li>
