@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Portfolio — [MART]</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
@@ -23,6 +23,10 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
+    /* Impedisce lo zoom tramite gesti touch */
+    body {
+      touch-action: manipulation;
+    }
 
     body {
       background: var(--bg);
@@ -560,7 +564,6 @@
     <li><button onclick="showPage('about')"  id="btn-about">Contatti</button></li>
   </ul>
 </nav>
-
 
 <!-- ═══════════ LIGHTBOX — stile Instagram Web ═══════════ -->
 <div class="lightbox" id="lightbox">
@@ -1318,6 +1321,28 @@ let lbImages = [];
     if (e.key === 'ArrowLeft') lbStep(-1);
     if (e.key === 'ArrowUp') postStep(-1);
     if (e.key === 'ArrowDown') postStep(1);
+
+  /* ── BLOCCO ZOOM FORZATO ── */
+  // Impedisce il pinch-to-zoom (due dita)
+  document.addEventListener('touchstart', function (event) {
+    if (event.touches.length > 1) {
+      event.preventDefault();
+    }
+  }, { passive: false });
+
+  // Impedisce il doppio tocco per zoomare
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function (event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, false);
+
+  // Blocca i gesti di zoom specifici su browser Safari
+  document.addEventListener('gesturestart', function (event) {
+    event.preventDefault();    
   });
 </script>
 
