@@ -31,27 +31,6 @@
       font-weight: 300;
       min-height: 100vh;
     }
-    /* Contenitore interno del Lightbox che ospita le foto */
-    .lb-img-col {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory; /* Obbliga l'immagine a fermarsi al centro */
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-x pan-y;
-}
-
-/* Ogni immagine del carosello */
-.lb-img-col img {
-  flex: 0 0 100%; /* Ogni foto occupa tutta la larghezza disponibile */
-  scroll-snap-align: center; /* Si aggancia al centro dello schermo */
-  object-fit: contain;
-}
-
-/* Nasconde la barra di scorrimento per estetica */
-.lb-img-col::-webkit-scrollbar {
-  display: none;
-}
 
     /* ──────── NAVBAR ──────── */
     nav {
@@ -295,28 +274,7 @@
     }
 
     /* Swipe touch */
-    .lb-img-col {
-     touch-action: pan-x pan-y; /* Permette lo scorrimento in entrambe le direzioni */
-    }
-    .lb-img-col {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory; /* Obbliga l'immagine a fermarsi al centro */
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch; /* Migliora la fluidità su iOS */
-}
-
-/* Ogni immagine all'interno deve avere lo snap-align */
-.lb-img-col img {
-  flex: 0 0 100%; /* Ogni immagine occupa l'intera larghezza */
-  scroll-snap-align: center;
-}
-
-/* Nascondi la barra di scorrimento per un look pulito */
-.lb-img-col::-webkit-scrollbar {
-  display: none;
-}
-    
+    .lb-img-col { touch-action: pan-y; }
 
     /* ── Colonna destra: testo descrittivo ── */
     .lb-sidebar {
