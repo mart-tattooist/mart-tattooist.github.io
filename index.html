@@ -1322,27 +1322,21 @@ let lbImages = [];
     if (e.key === 'ArrowUp') postStep(-1);
     if (e.key === 'ArrowDown') postStep(1);
 
-  /* ── BLOCCO ZOOM FORZATO ── */
-  // Impedisce il pinch-to-zoom (due dita)
+  /* ── BLOCCO ZOOM FORZATO (VERSIONE CORRETTA) ── */
+  // 1. Impedisce il pinch-to-zoom (due dita) ma lascia liberi i tocchi singoli
   document.addEventListener('touchstart', function (event) {
-    if (event.touches.length > 1) {
-      event.preventDefault();
-    }
-  }, { passive: false });
+     if (event.touches.length > 1) {
+       event.preventDefault();
+     }
+   }, { passive: false });
 
-  // Impedisce il doppio tocco per zoomare
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function (event) {
-    let now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-      event.preventDefault();
-    }
-    lastTouchEnd = now;
-  }, false);
+  // 2. Impedisce lo zoom del doppio tocco SENZA bloccare il click
+  // Usiamo una soluzione CSS più pulita per questo invece del JS aggressivo
+  document.documentElement.style.touchAction = 'manipulation';
 
-  // Blocca i gesti di zoom specifici su browser Safari
+  // 3. Blocca i gesti di zoom specifici su browser Safari (iOS)
   document.addEventListener('gesturestart', function (event) {
-    event.preventDefault();    
+    event.preventDefault();
   });
 </script>
 
