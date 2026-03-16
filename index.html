@@ -339,9 +339,78 @@
       .lb-post-next { right: 0.4rem; }
       .lb-panel { margin: 0 3rem; }
     }
+/* --- MODIFICHE PER MOBILE (Lighbox tipo Instagram) --- */
     @media (max-width: 680px) {
-      .lb-panel { margin: 0; }
-      .lb-post-prev, .lb-post-next { display: none; }
+      .lb-panel {
+        flex-direction: column; /* Foto sopra, testo sotto */
+        width: 100vw;           /* Occupa tutta la larghezza */
+        height: 100vh;          /* Occupa tutta l'altezza dello schermo */
+        border-radius: 0;
+        background: var(--bg);  /* Fondo scuro come il sito */
+        justify-content: flex-start;
+        overflow-y: auto;       /* Permette di scorrere se il testo è lungo */
+      }
+
+      .lb-img-col {
+        flex: 0 0 auto;         /* La foto non si espande a caso */
+        width: 100%;
+        height: 70vh;           /* Altezza fissa per la foto (70% dello schermo) */
+        background: #000;
+      }
+
+      .lb-sidebar {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding: 1rem 1.2rem 3rem; /* Spazio per il testo */
+        max-height: none;        /* Rimuoviamo il limite di altezza precedente */
+        justify-content: flex-start;
+      }
+
+      /* Testo della descrizione */
+      .lb-caption {
+        display: block;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+
+      /* Stato compresso: massimo 3 righe */
+      .lb-caption.collapsed {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      /* Il tastino "...altro" in grigio chiaro */
+      .lb-more-btn {
+        color: #888; /* Grigio chiaro */
+        cursor: pointer;
+        font-weight: 400;
+        display: inline-block;
+        margin-top: 4px;
+        text-decoration: none;
+      }
+
+      /* I puntini sopra la foto */
+      .lb-dots {
+        bottom: 1.5rem; /* Leggermente più su dal bordo */
+      }
+      
+      /* Sposta la X di chiusura in alto a destra sopra la foto */
+      .lb-close {
+        position: fixed;
+        top: 10px;
+        right: 15px;
+        z-index: 1000;
+        background: rgba(0,0,0,0.5);
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
 
     /* su mobile: sidebar va sotto l'immagine */
@@ -530,6 +599,12 @@
     <img src="logo.png" alt="Logo" onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block'">
     <span class="logo-fallback" style="display:none">MART</span>
   </div>
+  
+  <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
 
   <ul class="nav-links" id="nav-links">
     <li><button onclick="showPage('lavori')" id="btn-lavori" class="active">Lavori</button></li>
@@ -1186,15 +1261,37 @@ let lbImages = [];
     }
   }
 
+/* Sostituisci la vecchia function loadPost con questa */
   function loadPost(el) {
     const raw = el.getAttribute('data-images') || '';
     lbImages = raw.split(',').map(s => s.trim()).filter(Boolean);
     lbCurrent = 0;
     if (!lbImages.length) return;
-    document.getElementById('lb-caption').innerHTML = el.getAttribute('data-caption') || '';
+
+    const captionText = el.getAttribute('data-caption') || '';
+    const captionEl = document.getElementById('lb-caption');
+    
+    // Resettiamo il contenuto e lo stato
+    captionEl.classList.remove('collapsed');
+    
+    // Se siamo su mobile e il testo è lungo, attiviamo l'effetto "altro"
+    if (window.innerWidth <= 680 && captionText.length > 100) {
+        captionEl.classList.add('collapsed');
+        captionEl.innerHTML = captionText + ' <span class="lb-more-btn" onclick="expandCaption(this)">...altro</span>';
+    } else {
+        captionEl.innerHTML = captionText;
+    }
+
     buildDots();
     lbShow();
-  }
+}
+
+/* AGGIUNGI QUESTA FUNZIONE SUBITO SOTTO loadPost */
+function expandCaption(btn) {
+    const captionEl = document.getElementById('lb-caption');
+    captionEl.classList.remove('collapsed'); // Rimuove il limite delle 3 righe
+    btn.remove(); // Rimuove la scritta "...altro"
+}
 
   function postStep(dir) {
     if (!allPosts.length) return;
