@@ -3,62 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Portfolio — MART</title>
+  <title>Portfolio — [MART]</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg: #0f0f0f;
-      --surface: #1a1a1a;
-      --text: #f0ece8;
-      --muted: #888;
-      --accent: #c9a96e;
+      --bg:       #0f0f0f;
+      --surface:  #1a1a1a;
+      --surface2: #222;
+      --lb-bg:    #333333;
+      --border:   #2e2e2e;
+      --text:     #f0ece8;
+      --muted:    #888;
+      --accent:   #c9a96e;
       --font: 'DM Sans', sans-serif;
-      --border: #2e2e2e;
+      --gap: 1.2rem;
     }
 
-    /* Blocca zoom e rimbalzi */
-    html, body { 
-      touch-action: pan-x pan-y; 
-      user-select: none; 
-      -webkit-user-select: none;
+    /* REGOLE GENERALI E BLOCCO ZOOM MOBILE */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
       background: var(--bg);
       color: var(--text);
       font-family: var(--font);
-      margin: 0; padding: 0;
+      line-height: 1.6;
       overflow-x: hidden;
+      /* Impedisce zoom accidentale su mobile */
+      touch-action: pan-x pan-y;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
-    header { padding: 3rem 1rem; text-align: center; }
-    header h1 { font-size: 2rem; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; }
-
-    nav { 
-      position: sticky; top: 0; background: var(--bg); z-index: 100; 
-      padding: 15px; display: flex; justify-content: center; gap: 10px;
+    /* --- HEADER & NAV (Tua versione desktop corretta) --- */
+    header {
+      padding: 4rem 1rem 2rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-weight: 200;
+      letter-spacing: 0.5rem;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(15,15,15,0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
       border-bottom: 1px solid var(--border);
     }
-
-    nav button { 
-      background: none; border: 1px solid var(--border); color: var(--text); 
-      padding: 8px 20px; border-radius: 20px; cursor: pointer; transition: 0.3s;
+    nav button {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 0.6rem 1.2rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 2rem;
     }
-    nav button.active { background: var(--accent); color: #000; border-color: var(--accent); }
-
-    .page { display: none; padding: 10px; max-width: 1200px; margin: 0 auto; }
-    .page.visible { display: block; }
-
-    .grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-      gap: 10px; 
+    nav button:hover { color: var(--text); }
+    nav button.active {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(201, 169, 110, 0.1);
     }
 
-    .grid-item { cursor: pointer; position: relative; overflow: hidden; border-radius: 8px; }
-    .grid-item img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; transition: 0.3s; }
-    .grid-item:hover img { transform: scale(1.05); }
+    /* --- GRID (Tua versione desktop corretta) --- */
+    .page { display: none; padding: var(--gap); max-width: 1400px; margin: 0 auto; }
+    .page.visible { display: block; animation: fadeIn 0.6s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Struttura Lightbox tipo Instagram */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--gap);
+    }
+    .grid-item {
+      position: relative;
+      aspect-ratio: 1;
+      background: var(--surface);
+      overflow: hidden;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .grid-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .grid-item:hover img { transform: scale(1.08); }
+
+    /* --- LIGHTBOX (OTTIMIZZATO MOBILE INSTAGRAM + DESKTOP) --- */
     #lightbox {
       position: fixed;
       top: 0; left: 0;
@@ -79,71 +127,97 @@
       scroll-snap-type: y mandatory;
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
-      padding-top: 20px;
+      padding: 20px 0;
     }
 
     .lb-content {
       background: var(--surface);
       width: 100%;
-      max-width: 500px;
+      max-width: 550px;
       margin-bottom: 30px;
       flex-shrink: 0;
       scroll-snap-align: center;
+      position: relative;
       display: flex;
       flex-direction: column;
-      border-radius: 0 0 12px 12px;
     }
 
-    .img-container { position: relative; width: 100%; line-height: 0; background: #000; }
+    .img-container { position: relative; width: 100%; line-height: 0; }
     #lb-img { width: 100%; height: auto; display: block; }
 
+    /* PUNTINI SOPRA LA FOTO */
     #lb-dots {
       position: absolute; bottom: 15px; left: 50%;
-      transform: translateX(-50%); display: flex; gap: 5px;
+      transform: translateX(-50%); display: flex; gap: 6px; z-index: 10;
     }
     .lb-dot { width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; }
     .lb-dot.active { background: #fff; }
 
-    #lb-caption { padding: 15px; background: var(--surface); }
+    /* DESCRIZIONE SOTTO LA FOTO */
+    #lb-caption { padding: 15px; background: var(--surface); border-radius: 0 0 8px 8px; }
     .caption-text {
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
       overflow: hidden; font-size: 0.95rem; color: var(--text);
     }
     .caption-text.expanded { -webkit-line-clamp: unset; }
-    .read-more { color: var(--muted); font-size: 0.85rem; cursor: pointer; margin-top: 8px; display: inline-block; }
+    .read-more { color: var(--muted); font-size: 0.85rem; cursor: pointer; margin-top: 5px; display: inline-block; }
+
+    /* --- VIDEO SECTION (Tua versione originale) --- */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--gap);
+    }
+    .video-card { background: var(--surface); padding: 1rem; border-radius: 8px; text-align: center; }
+    .video-link { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 4px; }
+      header { padding: 2rem 1rem; }
+      .lb-content { max-width: 100%; }
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>MART</h1>
+    <h1>[MART]</h1>
   </header>
 
   <nav>
     <button class="active" onclick="showPage('tatuaggi')">Tatuaggi</button>
     <button onclick="showPage('flash')">Flash</button>
+    <button onclick="showPage('video')">Video</button>
   </nav>
 
   <div id="page-tatuaggi" class="page visible">
     <div class="grid">
-      <div class="grid-item" onclick="openLightbox(this)" data-images="https://images.unsplash.com/photo-1550684848-fac1c5b4e853" data-caption="Galeone tradizionale realizzato su avambraccio.">
-        <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853" alt="Tattoo 1">
-      </div>
-      <div class="grid-item" onclick="openLightbox(this)" data-images="https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28" data-caption="Dettaglio rosa realistica in bianco e nero.">
-        <img src="https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28" alt="Tattoo 2">
+      <div class="grid-item" onclick="openLightbox(this)" 
+           data-images="URL_FOTO_1, URL_FOTO_2" 
+           data-caption="Inserisci qui la tua descrizione molto lunga per testare l'effetto espandibile di Instagram che abbiamo creato.">
+        <img src="URL_FOTO_1" alt="">
       </div>
     </div>
   </div>
 
   <div id="page-flash" class="page">
     <div class="grid">
-      <div class="grid-item" onclick="openLightbox(this)" data-images="https://images.unsplash.com/photo-1560707303-4e980ce876ad" data-caption="Flash disponibili per la prossima settimana.">
-        <img src="https://images.unsplash.com/photo-1560707303-4e980ce876ad" alt="Flash 1">
+      <div class="grid-item" onclick="openLightbox(this)" data-images="URL_FLASH_1" data-caption="Flash disponibile.">
+        <img src="URL_FLASH_1" alt="">
       </div>
     </div>
   </div>
 
-  <div class="lightbox" id="lightbox">
+  <div id="page-video" class="page">
+    <div class="video-grid">
+      <div class="video-card">
+        <p>Guarda i miei lavori su</p>
+        <a href="URL_INSTAGRAM" target="_blank" class="video-link">Instagram Reels</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="lightbox">
     <div style="position:absolute; inset:0;" onclick="closeLightbox()"></div>
     <div id="lb-main">
       <div class="lb-content" onclick="event.stopPropagation()">
@@ -171,18 +245,18 @@
       allPosts = Array.from(activePage.querySelectorAll('.grid-item'));
       postIndex = allPosts.indexOf(el);
       loadPost(el);
-      document.getElementById('lightbox').style.display = 'flex';
+      document.getElementById('lightbox').classList.add('open');
       document.body.style.overflow = 'hidden';
     }
 
     function closeLightbox() {
-      document.getElementById('lightbox').style.display = 'none';
+      document.getElementById('lightbox').classList.remove('open');
       document.body.style.overflow = '';
     }
 
     function loadPost(el) {
       const raw = el.getAttribute('data-images') || '';
-      lbImages = raw.split(',').map(s => s.trim());
+      lbImages = raw.split(',').map(s => s.trim()).filter(Boolean);
       lbCurrent = 0;
       
       const caption = el.getAttribute('data-caption') || '';
@@ -194,7 +268,7 @@
       
       setTimeout(() => {
         const txt = document.getElementById('cap-text');
-        if (txt.scrollHeight <= txt.offsetHeight) {
+        if (txt && txt.scrollHeight <= txt.offsetHeight) {
           document.getElementById('read-btn').style.display = 'none';
         }
       }, 100);
@@ -225,7 +299,7 @@
       document.querySelectorAll('.lb-dot').forEach((d, i) => d.classList.toggle('active', i === lbCurrent));
     }
 
-    // Swipe orizzontale
+    // SWIPE ORIZZONTALE
     let touchX = 0;
     document.querySelector('.img-container').addEventListener('touchstart', e => touchX = e.touches[0].clientX);
     document.querySelector('.img-container').addEventListener('touchend', e => {
