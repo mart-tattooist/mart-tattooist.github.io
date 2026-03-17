@@ -372,22 +372,62 @@
       .lb-post-prev, .lb-post-next { display: none; }
     }
 
-    /* su mobile: sidebar va sotto l'immagine */
+    /* su mobile: sidebar va sotto l'immagine e layout stile Instagram */
     @media (max-width: 680px) {
       .lb-panel {
         flex-direction: column;
-        width: 96vw;
-        height: 92vh;
+        width: 100vw;
+        height: 100vh; /* Occupa tutto lo schermo */
+        border-radius: 0;
+        background: var(--bg); /* Sfondo scuro per tutto il post */
+      }
+      .lb-img-col {
+        flex: 0 0 auto;
+        height: 65vh; /* La foto occupa il 65% in alto */
+        background: #000;
       }
       .lb-sidebar {
         width: 100%;
+        flex: 1; /* Il testo prende lo spazio restante sotto */
         border-left: none;
-        border-top: 1px solid rgba(255,255,255,0.08);
+        border-top: none;
         padding: 1rem 1.2rem;
-        max-height: 120px;
-        overflow-y: auto;
+        justify-content: flex-start;
+        max-height: none;
+        overflow-y: auto; /* Permette di scorrere se il testo aperto è lunghissimo */
+      }
+      .lb-caption-wrapper {
+        display: flex;
+        flex-direction: column;
         justify-content: flex-start;
       }
+      /* Troncamento automatico a 3 righe */
+      .lb-caption {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .lb-caption.expanded {
+        -webkit-line-clamp: unset; /* Rilascia il blocco quando espanso */
+      }
+      .lb-more-btn {
+        color: var(--muted);
+        font-size: 0.82rem;
+        cursor: pointer;
+        margin-top: 4px;
+        align-self: flex-start;
+      }
+      /* Mantiene i pallini ancorati al fondo della foto (sovrapposti) */
+      .lb-dots {
+        bottom: 12px;
+      }
+    }
+    
+    /* Regola base per nascondere il tasto su computer */
+    @media (min-width: 681px) {
+      .lb-more-btn { display: none !important; }
+      .lb-caption-wrapper { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
     }
 
     /* ──────── ABOUT ──────── */
@@ -600,7 +640,10 @@
     <!-- DESTRA: testo descrittivo allineato in basso -->
     <div class="lb-sidebar">
       <button class="lb-close" onclick="closeLightbox()">×</button>
-      <div class="lb-caption" id="lb-caption"></div>
+      <div class="lb-caption-wrapper">
+        <div class="lb-caption" id="lb-caption"></div>
+        <span class="lb-more-btn" id="lb-more-btn" onclick="toggleCaption()">...altro</span>
+      </div>
     </div>
 
   </div>
@@ -1224,15 +1267,43 @@ let lbImages = [];
     }
   }
 
+  /* --- NUOVA FUNZIONE ESPANSIONE TESTO --- */
+  function toggleCaption() {
+    const cap = document.getElementById('lb-caption');
+    const btn = document.getElementById('lb-more-btn');
+    if (cap.classList.contains('expanded')) {
+      cap.classList.remove('expanded');
+      btn.innerText = '...altro';
+    } else {
+      cap.classList.add('expanded');
+      btn.innerText = 'nascondi';
+    }
+  }
+
   function loadPost(el) {
     const raw = el.getAttribute('data-images') || '';
     lbImages = raw.split(',').map(s => s.trim()).filter(Boolean);
     lbCurrent = 0;
     if (!lbImages.length) return;
-    document.getElementById('lb-caption').innerHTML = el.getAttribute('data-caption') || '';
+    
+    const captionText = el.getAttribute('data-caption') || '';
+    const captionEl = document.getElementById('lb-caption');
+    const moreBtn = document.getElementById('lb-more-btn');
+    
+    captionEl.innerHTML = captionText;
+    captionEl.classList.remove('expanded'); // Resetta il testo a 3 righe se era aperto
+    
+    // Mostra il tasto "...altro" solo se il testo è lungo e siamo su mobile
+    if (moreBtn) {
+      moreBtn.innerText = '...altro';
+      if (captionText.length > 50 && window.innerWidth <= 680) {
+        moreBtn.style.display = 'inline-block';
+      } else {
+        moreBtn.style.display = 'none';
+      }
+    }
 
     const sliderWrap = document.getElementById('lb-slider-wrap');
-    sliderWrap.innerHTML = '';
     
     // Creiamo un contenitore "slide" per ogni immagine
     lbImages.forEach(src => {
