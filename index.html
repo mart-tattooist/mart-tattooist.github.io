@@ -23,6 +23,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
+    /* PROTEZIONE IMMAGINI */
+    img {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      pointer-events: none;
+    }
+
     html, body {
       /* RIPRISTINA LO SFONDO E IL FONT UNIFICATO */
       background: var(--bg); 
@@ -404,11 +415,35 @@
       .lb-img-col {
         width: 100%;
         flex: 0 0 auto;
-        height: auto; /* Non forziamo più l'altezza */
-        max-height: 70vh; /* Al massimo occupa il 70% dello schermo per lasciare spazio al testo */
+        height: auto;
+        max-height: 65vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative; /* <--- Importante: serve a fare da base per i pallini */
+        background: #000;
+      }
+
+      .lb-dots {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        position: absolute; /* <--- Ora galleggiano sopra la foto */
+        bottom: 15px;       /* Distanza dal fondo della foto */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        background: rgba(0,0,0,0.2); /* Un leggero ombra per vederli meglio sulle foto chiare */
+        padding: 5px 10px;
+        border-radius: 20px;
+      }
+
+      .lb-sidebar {
+        width: 100%;
+        flex: 0 0 auto;
+        padding: 1rem 1.2rem;
+        background: var(--bg);
+        margin-top: 0; /* <--- Attacca la descrizione alla foto */
       }
 
       /* La descrizione sta sotto, ben staccata */
@@ -1437,6 +1472,11 @@ let lbImages = [];
     if (e.key === 'ArrowLeft') lbStep(-1);
     if (e.key === 'ArrowUp') postStep(-1);
     if (e.key === 'ArrowDown') postStep(1);
+  
+  // Blocca il menù del tasto destro su tutto il sito
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  }, false);
 
   });
 </script>
