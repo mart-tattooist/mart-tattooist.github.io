@@ -22,18 +22,20 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    /* Impedisce lo zoom tramite gesti touch */
+
     html, body {
+      /* RIPRISTINA LO SFONDO E IL FONT UNIFICATO */
+      background: var(--bg); 
+      color: var(--text);
+      font-family: var(--font); /* Forza DM Sans ovunque */
+      
       overflow-x: hidden;
-      /* 'manipulation' abilita scorrimento e click, ma disabilita il pinch-zoom e il double-tap-zoom */
       touch-action: manipulation; 
     }
 
-    /* Protezione extra per le immagini del portfolio */
-    .grid-item, .lb-slide img {
+    /* Protezione extra per Safari */
+    :root {
       touch-action: manipulation;
-      -webkit-user-drag: none;
-      -webkit-touch-callout: none; /* Impedisce il menu contestuale "salva immagine" al tocco lungo */
     }
 
     /* ──────── NAVBAR ──────── */
@@ -72,12 +74,18 @@
 
     .nav-links { display: flex; gap: 2.2rem; list-style: none; }
     .nav-links button {
-      background: none; border: none;
+      background: none; 
+      border: none;
       color: var(--muted);
-      font-family: var(--font); font-weight: 300;
-      font-size: 0.8rem; letter-spacing: 0.14em;
-      text-transform: uppercase; cursor: pointer;
-      transition: color 0.22s; padding: 0.2rem 0; position: relative;
+      font-family: var(--font); /* Assicura che anche il menu sia DM Sans */
+      font-weight: 300;
+      font-size: 0.8rem; 
+      letter-spacing: 0.14em;
+      text-transform: uppercase; 
+      cursor: pointer;
+      transition: color 0.22s; 
+      padding: 0.2rem 0; 
+      position: relative;
     }
     .nav-links button::after {
       content: ''; position: absolute;
