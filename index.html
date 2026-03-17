@@ -413,13 +413,15 @@
 
       /* La colonna immagine ora si adatta al centro */
       .lb-img-col {
-        flex: 1; /* Prende tutto lo spazio rimasto libero dalla sidebar */
-        height: 100%;
-        background: #000;
+        width: 100%;
+        flex: 0 0 auto;
+        height: auto;
+        max-height: 65vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        position: relative;
+        position: relative; /* <--- Importante: serve a fare da base per i pallini */
+        background: #000;
       }
 
       .lb-dots {
