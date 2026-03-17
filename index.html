@@ -215,6 +215,17 @@
     }
     .lightbox.open { display: flex; }
 
+    #lb-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column; /* Fondamentale per mettere foto sopra e testo sotto */
+      align-items: center;    /* Centra tutto orizzontalmente */
+      justify-content: center; /* Centra tutto verticalmente */
+      background: #000;       /* Nero totale dietro */
+      position: relative;
+      overflow: hidden;
+    }
+
     /* Pannello: immagine a sinistra + sidebar testo a destra */
     .lb-panel {
       background: var(--lb-bg);
@@ -257,13 +268,11 @@
       cursor: pointer; /* Fa capire che qui si può cliccare per uscire */
     }
     .lb-slide img {
-      width: 100%;
-      height: 100%;
-      /* Cambiamo da 'cover' a 'contain' così la foto si vede TUTTA intera senza tagli, 
-         oppure teniamo 'cover' ma allineata in alto */
-      object-fit: top; 
-      background: #000; /* Fondo nero se la foto non riempie tutto lo spazio */
-    }
+        width: 100%;
+        height: auto;
+        max-height: 70vh;
+        object-fit: contain; /* Assicura che la foto sia intera al 100% */
+      }
 
     /* Frecce INTERNE al post — solo chevron, nessun bollo */
     .lb-btn {
@@ -287,10 +296,12 @@
 
     /* Dots in basso all'immagine — trasparenti come Instagram */
     .lb-dots {
-      position: absolute;
-      bottom: 1rem; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 5px; z-index: 10;
-    }
+        position: absolute;
+        bottom: 10px; /* Li tiene dentro la foto in basso */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+      }
     .lb-dot {
       width: 6px; height: 6px; border-radius: 50%;
       background: rgba(255,255,255,0.35);
@@ -374,29 +385,37 @@
 
     /* su mobile: sidebar va sotto l'immagine e layout stile Instagram */
     @media (max-width: 680px) {
+      /* Il pannello ora è un contenitore flessibile che centra il contenuto */
       .lb-panel {
         flex-direction: column;
         width: 100vw;
-        height: 100vh; /* Occupa tutto lo schermo */
+        height: 100vh;
         border-radius: 0;
-        background: var(--bg); /* Sfondo scuro per tutto il post */
+        background: transparent; /* Sfondo trasparente per far risaltare la foto */
+        justify-content: center; /* CENTRA TUTTO VERTICALMENTE */
+        align-items: center;
       }
+
+      /* La colonna immagine ora si adatta al centro */
       .lb-img-col {
+        width: 100%;
         flex: 0 0 auto;
-        height: 60vh; /* Ridotto leggermente per dare spazio */
-        background: #000;
-        margin-top: 40px; /* Sposta la foto verso il basso rispetto al bordo superiore */
+        height: auto; /* Non forziamo più l'altezza */
+        max-height: 70vh; /* Al massimo occupa il 70% dello schermo per lasciare spazio al testo */
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
+
+      /* La descrizione sta sotto, ben staccata */
       .lb-sidebar {
         width: 100%;
-        flex: 1; /* Il testo prende lo spazio restante sotto */
-        border-left: none;
+        flex: 0 0 auto;
+        padding: 1.5rem 1.2rem;
+        background: var(--bg); /* Il fondo nero torna solo qui sotto */
         border-top: none;
-        padding: 1rem 1.2rem;
-        justify-content: flex-start;
-        max-height: none;
-        overflow-y: auto; /* Permette di scorrere se il testo aperto è lunghissimo */
       }
+
       .lb-caption-wrapper {
         display: flex;
         flex-direction: column;
