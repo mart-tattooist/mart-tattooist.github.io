@@ -257,12 +257,12 @@
       cursor: pointer; /* Fa capire che qui si può cliccare per uscire */
     }
     .lb-slide img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      display: block;
-      user-select: none;
-      cursor: default; /* Sulla foto il cursore torna normale */
+      width: 100%;
+      height: 100%;
+      /* Cambiamo da 'cover' a 'contain' così la foto si vede TUTTA intera senza tagli, 
+         oppure teniamo 'cover' ma allineata in alto */
+      object-fit: top; 
+      background: #000; /* Fondo nero se la foto non riempie tutto lo spazio */
     }
 
     /* Frecce INTERNE al post — solo chevron, nessun bollo */
@@ -318,7 +318,7 @@
 
     /* Tasto chiudi — in alto a destra della sidebar */
     .lb-close {
-      position: absolute; top: 0.9rem; right: 1rem;
+      position: absolute; top: 10px; right: 15px;
       background: none; border: none;
       color: rgba(255,255,255,0.4); font-size: 1.6rem;
       cursor: pointer; transition: color 0.2s; z-index: 10; line-height: 1;
@@ -383,8 +383,9 @@
       }
       .lb-img-col {
         flex: 0 0 auto;
-        height: 65vh; /* La foto occupa il 65% in alto */
+        height: 60vh; /* Ridotto leggermente per dare spazio */
         background: #000;
+        margin-top: 40px; /* Sposta la foto verso il basso rispetto al bordo superiore */
       }
       .lb-sidebar {
         width: 100%;
