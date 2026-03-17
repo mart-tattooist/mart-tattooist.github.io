@@ -296,8 +296,12 @@
 
     /* Dots in basso all'immagine — trasparenti come Instagram */
     .lb-dots {
+        display: flex;            /* <--- Questo li mette in fila */
+        flex-direction: row;      /* <--- Questo forza l'orizzontale */
+        gap: 8px;                 /* <--- Questo dà spazio tra un pallino e l'altro */
+        
         position: absolute;
-        bottom: 10px; /* Li tiene dentro la foto in basso */
+        bottom: 15px;             /* Alzati leggermente per non toccare il bordo foto */
         left: 50%;
         transform: translateX(-50%);
         z-index: 10;
