@@ -1286,14 +1286,16 @@ let lbImages = [];
     lbCurrent = 0;
     if (!lbImages.length) return;
     
+    // 1. GESTIONE DEL TESTO E DEL TASTO "...ALTRO"
     const captionText = el.getAttribute('data-caption') || '';
     const captionEl = document.getElementById('lb-caption');
     const moreBtn = document.getElementById('lb-more-btn');
     
-    captionEl.innerHTML = captionText;
-    captionEl.classList.remove('expanded'); // Resetta il testo a 3 righe se era aperto
+    if (captionEl) {
+      captionEl.innerHTML = captionText;
+      captionEl.classList.remove('expanded'); // Resetta a 3 righe
+    }
     
-    // Mostra il tasto "...altro" solo se il testo è lungo e siamo su mobile
     if (moreBtn) {
       moreBtn.innerText = '...altro';
       if (captionText.length > 50 && window.innerWidth <= 680) {
@@ -1303,19 +1305,25 @@ let lbImages = [];
       }
     }
 
+    // 2. GESTIONE DELLE IMMAGINI (Questa è la parte che mancava!)
     const sliderWrap = document.getElementById('lb-slider-wrap');
-    
-    // Creiamo un contenitore "slide" per ogni immagine
-    lbImages.forEach(src => {
-      const slide = document.createElement('div');
-      slide.className = 'lb-slide';
-      const img = document.createElement('img');
-      img.src = src;
-      slide.appendChild(img);
-      sliderWrap.appendChild(slide);
-    });
-    
-    sliderWrap.style.transform = `translateX(0%)`;
+    if (sliderWrap) {
+      sliderWrap.innerHTML = ''; // Svuota le foto del post precedente
+      
+      // Crea le nuove foto
+      lbImages.forEach(src => {
+        const slide = document.createElement('div');
+        slide.className = 'lb-slide';
+        const img = document.createElement('img');
+        img.src = src;
+        slide.appendChild(img);
+        sliderWrap.appendChild(slide);
+      });
+      
+      // Riporta il nastro alla prima foto
+      sliderWrap.style.transform = `translateX(0%)`;
+    }
+
     buildDots();
     lbShow();
   }
