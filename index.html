@@ -401,49 +401,48 @@
 
     /* ══════════════════════════════════════════
        LAYOUT MOBILE LIGHTBOX — stile IG feed
-       Compatibile con tutti i browser/dispositivi
-       (usa --app-height settato via JS invece di dvh)
+       Altezze FISSE per sidebar e dots → l'immagine
+       è sempre nella stessa posizione su tutti i device.
     ══════════════════════════════════════════ */
     @media (max-width: 680px) {
 
-      /* Blocca overscroll/pull-to-refresh sul pannello */
+      /* Blocca overscroll e pull-to-refresh */
       .lightbox {
         overflow: hidden;
         overscroll-behavior: none;
       }
 
-      /* Il pannello occupa ESATTAMENTE lo schermo visibile:
-         --app-height viene impostato via JS → compatibile con tutti i browser,
-         inclusi Android vecchi che non supportano dvh.
-         Fallback: 100vh. */
+      /* Il pannello occupa tutto lo schermo visibile.
+         padding-top: 64px → il contenuto parte SEMPRE
+         esattamente sotto la navbar, su ogni dispositivo. */
       .lb-panel {
         flex-direction: column;
         width: 100vw;
         height: var(--app-height, 100vh);
+        padding-top: 64px;      /* spazio fisso per la navbar */
         border-radius: 0;
         background: #000;
         overflow: hidden;
-        /* flex column: img → dots → sidebar, dall'alto */
         justify-content: flex-start;
         align-items: stretch;
       }
 
-      /* L'immagine si espande per riempire tutto lo spazio libero */
+      /* Immagine: cresce per riempire tutto lo spazio fisso disponibile.
+         Poiché sidebar e dots hanno altezza fissa, anche questa è fissa
+         → stessa posizione su tutti i post e su tutti i device. */
       .lb-img-col {
-        flex: 1 1 0;          /* cresce, ma non più dello spazio disponibile */
-        min-height: 0;        /* fondamentale: evita overflow in flex */
+        flex: 1 1 0;
+        min-height: 0;          /* evita overflow in flex */
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         background: #000;
-        /* Su mobile gestiamo tutti i touch via JS → nessun pan nativo */
         touch-action: none;
       }
 
-      /* DOTS — vivono nello spazio tra foto e descrizione,
-         con padding uguale sopra e sotto per centratura visiva */
+      /* DOTS — altezza fissa 36px, centrati tra foto e descrizione */
       .lb-dots {
         position: static;
         transform: none;
@@ -452,29 +451,37 @@
         justify-content: center;
         align-items: center;
         gap: 8px;
-        flex: 0 0 auto;
+        flex: 0 0 36px;         /* altezza FISSA */
         width: 100%;
-        padding: 0.8rem 0;   /* stessa spaziatura sopra e sotto i pallini */
         background: #000;
         z-index: auto;
       }
 
-      /* Sidebar: descrizione in basso a sfondo scuro */
+      /* Sidebar — altezza fissa 120px: padding + 3 righe testo.
+         overflow:hidden nasconde il testo extra (già gestito da line-clamp).
+         Questa costante è la chiave per tenere l'immagine sempre ferma. */
       .lb-sidebar {
-        flex: 0 0 auto;
+        flex: 0 0 120px;        /* altezza FISSA */
         width: 100%;
-        padding: 1.2rem 1.2rem 1.4rem;
+        padding: 0.9rem 1.2rem 0;
         background: var(--bg);
-        border-top: 1px solid rgba(255,255,255,0.06);
+        border-top: 1px solid rgba(255,255,255,0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
       }
 
       .lb-caption-wrapper {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
+        flex: 1 1 0;
+        min-height: 0;
+        overflow: hidden;
       }
 
-      /* Troncamento automatico a 3 righe */
+      /* Testo troncato a 3 righe */
       .lb-caption {
         display: -webkit-box;
         -webkit-line-clamp: 3;
@@ -490,6 +497,13 @@
         cursor: pointer;
         margin-top: 4px;
         align-self: flex-start;
+        flex-shrink: 0;
+      }
+
+      /* Il tasto chiudi su mobile: in alto a destra della sidebar */
+      .lb-close {
+        top: 6px;
+        right: 10px;
       }
     }
     
