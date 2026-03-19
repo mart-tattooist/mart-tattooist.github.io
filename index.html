@@ -686,6 +686,13 @@
       .swipe-down-active {
         animation: slideDownFeed 0.38s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
       }
+      
+      .lb-slide video {
+        display: block;
+        margin: auto;
+        outline: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
     }
   </style>
 </head>
@@ -1177,13 +1184,22 @@
       </div>
     </div>
 
-    <div class="grid-item" data-images="video3.jpg" onclick="openLightbox(this)">
-      <div class="grid-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Video 3
+    <div class="flash-wrap">
+      <div class="grid-item" 
+           data-video="REEL-tutto-d'un-fiato.mp4" 
+           data-caption="Video Reel: Tutto d'un fiato" 
+           onclick="openLightbox(this)">
+        
+        <img src="copertina-video-001.jpg" alt="Video Reel">
+    
+        <div class="grid-overlay">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
       </div>
-      <div class="grid-overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <div class="flash-meta">
+        <span class="available-label">Guarda il Reel</span>
       </div>
     </div>
 
@@ -1361,15 +1377,61 @@ let lbImages = [];
   }
 
   /* ── 3. LIGHTBOX ── */
+  /* --- GESTIONE APERTURA POST --- */
   function openLightbox(el) {
-    const activePage = document.querySelector('.page.visible');
-    allPosts = Array.from(activePage.querySelectorAll('.grid-item[onclick]'));
-    postIndex = allPosts.indexOf(el);
+    const video = el.getAttribute('data-video');
+    const imgs = el.getAttribute('data-images');
+    const cap = el.getAttribute('data-caption');
 
-    loadPost(el);
+    const postData = {
+      video: video,
+      images: imgs ? imgs.split(',') : [],
+      caption: cap || ''
+    };
+
+    // Cerchiamo il post nella lista globale per permettere lo scorrimento
+    postIndex = allPosts.findIndex(p => 
+      (video && p.video === video) || (imgs && p.images.join(',') === imgs)
+    );
+
+    loadPost(postData); // Carica il contenuto
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
     history.pushState({ lbOpen: true }, "");
+  }
+
+  /* --- CARICAMENTO CONTENUTO (Immagine o Video) --- */
+  function loadPost(postData) {
+    const sliderWrap = document.getElementById('lb-slider-wrap');
+    const captionEl = document.getElementById('lb-caption');
+    sliderWrap.innerHTML = '';
+    captionEl.innerHTML = postData.caption;
+
+    // Gestione VIDEO
+    if (postData.video) {
+      lbImages = [];
+      const slide = document.createElement('div');
+      slide.className = 'lb-slide active';
+      slide.innerHTML = `
+        <video src="${postData.video}" controls autoplay loop playsinline 
+               style="max-width:100%; max-height:80vh; border-radius:4px;">
+        </video>`;
+      sliderWrap.appendChild(slide);
+    } 
+    // Gestione IMMAGINI
+    else {
+      lbImages = postData.images;
+      lbCurrent = 0;
+      lbImages.forEach((src, idx) => {
+        const slide = document.createElement('div');
+        slide.className = 'lb-slide';
+        const img = document.createElement('img');
+        img.src = src.trim();
+        slide.appendChild(img);
+        sliderWrap.appendChild(slide);
+      });
+      lbShow(); // Mostra la prima immagine
+    }
   }
 
   function closeLightbox() {
@@ -1377,6 +1439,9 @@ let lbImages = [];
     if (lb.classList.contains('open')) {
       lb.classList.remove('open');
       document.body.style.overflow = '';
+      // Se c'è un video, lo fermiamo alla chiusura
+      const video = lb.querySelector('video');
+      if (video) video.pause();
       if (history.state && history.state.lbOpen) history.back();
     }
   }
