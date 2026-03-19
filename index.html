@@ -652,6 +652,31 @@
       .nav-links.mobile-open { display: flex; } /* Mostra al clic */
       .nav-links button { width: 100%; padding: 1.2rem 2rem; text-align: left; }
     }
+
+     /* ══════════════════════════════════════════
+     EFFETTO FEED VERTICALE (SOLO SU MOBILE)
+     ══════════════════════════════════════════ */
+    @media (max-width: 680px) {
+      /* Animazione per quando scorri il dito in SU (prossimo post) */
+      @keyframes slideUpFeed {
+        0% { transform: translateY(100vh); opacity: 0.5; }
+        100% { transform: translateY(0); opacity: 1; }
+      }
+  
+      /* Animazione per quando scorri il dito in GIÙ (post precedente) */
+      @keyframes slideDownFeed {
+        0% { transform: translateY(-100vh); opacity: 0.5; }
+        100% { transform: translateY(0); opacity: 1; }
+      }
+
+      /* Classi che il Javascript applicherà come "interruttori" */
+      .swipe-up-active {
+        animation: slideUpFeed 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+      }
+      .swipe-down-active {
+        animation: slideDownFeed 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1391,6 +1416,24 @@ let lbImages = [];
     if (!allPosts.length) return;
     postIndex = (postIndex + dir + allPosts.length) % allPosts.length;
     loadPost(allPosts[postIndex]);
+
+    // --- MAGIA PER L'EFFETTO FEED SOLO SU MOBILE ---
+    if (window.innerWidth <= 680) {
+      const panel = document.querySelector('.lb-panel');
+      
+      // 1. Spengo le animazioni precedenti
+      panel.classList.remove('swipe-up-active', 'swipe-down-active');
+      
+      // 2. Un trucchetto tecnico per far ripartire l'animazione da zero
+      void panel.offsetWidth; 
+      
+      // 3. Accendo l'animazione giusta in base a dove hai mosso il dito
+      if (dir > 0) {
+        panel.classList.add('swipe-up-active'); // Dito verso l'alto = sale un nuovo post
+      } else {
+        panel.classList.add('swipe-down-active'); // Dito verso il basso = scende il post vecchio
+      }
+    }
   }
 
   function lbStep(dir) {
