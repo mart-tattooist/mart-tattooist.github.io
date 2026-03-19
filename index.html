@@ -305,18 +305,19 @@
     .lb-prev { left: 0.5rem; }
     .lb-next { right: 0.5rem; }
 
-    /* Dots in basso all'immagine — trasparenti come Instagram */
+    /* Dots — su desktop: sovrapposti in basso all'immagine (posizionati rispetto al panel) */
     .lb-dots {
-        display: flex;            /* <--- Questo li mette in fila */
-        flex-direction: row;      /* <--- Questo forza l'orizzontale */
-        gap: 8px;                 /* <--- Questo dà spazio tra un pallino e l'altro */
-        
-        position: absolute;
-        bottom: 15px;             /* Alzati leggermente per non toccare il bordo foto */
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-      }
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      /* Su desktop: lb-panel è position:relative, lb-img-col occupa tutto meno 260px di sidebar */
+      position: absolute;
+      bottom: 18px;
+      left: 0;
+      right: 260px;          /* lascia fuori la sidebar */
+      justify-content: center;
+      z-index: 10;
+    }
     .lb-dot {
       width: 6px; height: 6px; border-radius: 50%;
       background: rgba(255,255,255,0.35);
@@ -327,13 +328,8 @@
       transform: scale(1.2);
     }
 
-    /* Swipe touch — su mobile gestiamo tutto via JS, nessun pan nativo */
-    .lb-img-col { touch-action: pan-x; }
-    @media (max-width: 680px) {
-      /* CRITICO: "none" impedisce al browser di intercettare i gesti verticali
-         ed elimina il pull-to-refresh di Chrome/Safari */
-      .lb-img-col { touch-action: none; }
-    }
+    /* Swipe touch */
+    .lb-img-col { touch-action: pan-y; }
 
     /* ── Colonna destra: testo descrittivo ── */
     .lb-sidebar {
@@ -405,10 +401,9 @@
 
     /* su mobile: sidebar va sotto l'immagine e layout stile Instagram */
     @media (max-width: 680px) {
-      /* Clippa l'animazione di swipe E blocca overscroll/pull-to-refresh */
+      /* La lightbox clippa l'animazione di swipe al bordo dello schermo */
       .lightbox {
         overflow: hidden;
-        overscroll-behavior: none;
       }
 
       /* Il pannello copre l'intero schermo con sfondo solido — niente griglie visibili sotto */
@@ -426,7 +421,7 @@
       /* La colonna immagine occupa tutto lo spazio disponibile sopra la sidebar */
       .lb-img-col {
         width: 100%;
-        flex: 1 1 auto; /* Si espande per riempire tutto lo spazio */
+        flex: 1 1 auto;
         min-height: 0;
         height: auto;
         display: flex;
@@ -434,29 +429,32 @@
         justify-content: center;
         position: relative;
         background: #000;
+        order: 1;
       }
 
+      /* Su mobile: i dots escono dal flusso assoluto e diventano
+         una riga flex tra immagine e descrizione */
       .lb-dots {
-        display: flex;
-        flex-direction: row;
-        gap: 8px;
-        position: absolute;
-        bottom: 15px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-        background: rgba(0,0,0,0.2);
-        padding: 5px 10px;
-        border-radius: 20px;
+        position: static;
+        transform: none;
+        flex: 0 0 auto;
+        order: 2;               /* tra img-col (order:1) e sidebar (order:3) */
+        justify-content: center;
+        padding: 0.85rem 0;     /* spaziatura uguale sopra e sotto i pallini */
+        background: transparent;
+        border-radius: 0;
+        width: 100%;
+        z-index: auto;
       }
 
-      /* Sidebar fissa in altezza così la foto sopra si adatta */
+      /* Sidebar sotto: testo descrittivo */
       .lb-sidebar {
         width: 100%;
         flex: 0 0 auto;
         padding: 1.5rem 1.2rem;
         background: var(--bg);
         border-top: 1px solid rgba(255,255,255,0.06);
+        order: 3;
       }
 
       .lb-caption-wrapper {
@@ -481,10 +479,7 @@
         margin-top: 4px;
         align-self: flex-start;
       }
-      /* Pallini leggermente più su */
-      .lb-dots {
-        bottom: 12px;
-      }
+
     }
     
     /* Regola base per nascondere il tasto su computer */
@@ -717,15 +712,17 @@
 
   <div class="lb-panel">
 
-    <!-- SINISTRA: immagine grande + frecce interne + dots -->
+    <!-- SINISTRA: immagine grande + frecce interne -->
     <div class="lb-img-col" id="lb-main">
       <button class="lb-btn lb-prev" onclick="lbStep(-1)">&#8249;</button>
       <div id="lb-slider-wrap" class="lb-slider-wrap"></div>
       <button class="lb-btn lb-next" onclick="lbStep(1)">&#8250;</button>
-      <div class="lb-dots" id="lb-dots"></div>
     </div>
 
-    <!-- DESTRA: testo descrittivo allineato in basso -->
+    <!-- DOTS: su desktop galleggiano sull'immagine, su mobile vivono tra foto e descrizione -->
+    <div class="lb-dots" id="lb-dots"></div>
+
+    <!-- DESTRA / SOTTO: testo descrittivo -->
     <div class="lb-sidebar">
       <button class="lb-close" onclick="closeLightbox()">×</button>
       <div class="lb-caption-wrapper">
@@ -1495,21 +1492,10 @@ let lbImages = [];
   /* ── 5. TOUCH & TASTIERA ── */
   let touchStartX = 0;
   let touchStartY = 0;
-
-  // NON passive: così possiamo chiamare preventDefault() e bloccare il pull-to-refresh
   document.getElementById('lb-main').addEventListener('touchstart', e => {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
-  }, { passive: false });
-
-  // BLOCCA pull-to-refresh e overscroll del browser quando la lightbox è aperta.
-  // DEVE essere non-passive per poter chiamare preventDefault().
-  const lightboxEl = document.getElementById('lightbox');
-  lightboxEl.addEventListener('touchmove', e => {
-    if (lightboxEl.classList.contains('open')) {
-      e.preventDefault();
-    }
-  }, { passive: false });
+  }, { passive: true });
 
   document.getElementById('lb-main').addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
