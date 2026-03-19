@@ -1378,6 +1378,7 @@ let lbImages = [];
 
   /* ── 3. LIGHTBOX ── */
   /* --- GESTIONE APERTURA POST --- */
+  /* --- APERTURA POST --- */
   function openLightbox(el) {
     const video = el.getAttribute('data-video');
     const imgs = el.getAttribute('data-images');
@@ -1389,25 +1390,23 @@ let lbImages = [];
       caption: cap || ''
     };
 
-    // Cerchiamo il post nella lista globale per permettere lo scorrimento
     postIndex = allPosts.findIndex(p => 
       (video && p.video === video) || (imgs && p.images.join(',') === imgs)
     );
 
-    loadPost(postData); // Carica il contenuto
+    loadPost(postData); 
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
     history.pushState({ lbOpen: true }, "");
   }
 
-  /* --- CARICAMENTO CONTENUTO (Immagine o Video) --- */
+  /* --- CARICAMENTO CONTENUTO --- */
   function loadPost(postData) {
-    const sliderWrap = document.getElementById('lb-slider-wrap');
+    const sliderWrap = document.getElementById('lb-slider-wrap'); // Ora il nome coincide!
     const captionEl = document.getElementById('lb-caption');
     sliderWrap.innerHTML = '';
     captionEl.innerHTML = postData.caption;
 
-    // Gestione VIDEO
     if (postData.video) {
       lbImages = [];
       const slide = document.createElement('div');
@@ -1417,29 +1416,43 @@ let lbImages = [];
                style="max-width:100%; max-height:80vh; border-radius:4px;">
         </video>`;
       sliderWrap.appendChild(slide);
-    } 
-    // Gestione IMMAGINI
-    else {
+    } else {
       lbImages = postData.images;
       lbCurrent = 0;
       lbImages.forEach((src, idx) => {
         const slide = document.createElement('div');
-        slide.className = 'lb-slide';
+        slide.className = 'lb-slide' + (idx === 0 ? ' active' : '');
         const img = document.createElement('img');
         img.src = src.trim();
         slide.appendChild(img);
         sliderWrap.appendChild(slide);
       });
-      lbShow(); // Mostra la prima immagine
+      // Non serve lbShow() qui se usiamo la classe 'active' direttamente
     }
+    if (typeof buildDots === "function") buildDots(); 
   }
 
+  /* --- NAVIGAZIONE IMMAGINI (Destra/Sinistra) --- */
+  function lbShow() {
+    const slides = document.querySelectorAll('.lb-slide');
+    slides.forEach((s, i) => {
+      s.classList.toggle('active', i === lbCurrent);
+    });
+    if (typeof buildDots === "function") buildDots();
+  }
+
+  function lbStep(dir) {
+    if (!lbImages.length) return;
+    lbCurrent = (lbCurrent + dir + lbImages.length) % lbImages.length;
+    lbShow();
+  }
+
+  /* --- CHIUSURA --- */
   function closeLightbox() {
     const lb = document.getElementById('lightbox');
     if (lb.classList.contains('open')) {
       lb.classList.remove('open');
       document.body.style.overflow = '';
-      // Se c'è un video, lo fermiamo alla chiusura
       const video = lb.querySelector('video');
       if (video) video.pause();
       if (history.state && history.state.lbOpen) history.back();
