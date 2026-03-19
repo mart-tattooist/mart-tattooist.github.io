@@ -1342,313 +1342,229 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ── VARIABILI GLOBALI ── */
-let lbImages = [];
-  let lbCurrent = 0;
-  let allPosts = [];
-  let postIndex = 0;
+let lbImages  = [];
+let lbCurrent = 0;
+let allPosts  = [];
+let postIndex = 0;
 
-  /* ── 1. NAVIGAZIONE TRA PAGINE ── */
-  function showPage(name, addHistory = true) {
-    const lb = document.getElementById('lightbox');
-    if (lb && lb.classList.contains('open')) {
-      lb.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    const navLinks = document.getElementById('nav-links');
-    if(navLinks) navLinks.classList.remove('mobile-open');
-
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
-    document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
-    
-    const targetPage = document.getElementById('page-' + name);
-    const targetBtn  = document.getElementById('btn-' + name);
-    
-    if(targetPage) targetPage.classList.add('visible');
-    if(targetBtn)  targetBtn.classList.add('active');
-
-    window.scrollTo({ top: 0 });
-    if (addHistory) history.pushState({ page: name }, "");
+/* ── 1. NAVIGAZIONE TRA PAGINE ── */
+function showPage(name, addHistory = true) {
+  const lb = document.getElementById('lightbox');
+  if (lb && lb.classList.contains('open')) {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
   }
+  const navLinks = document.getElementById('nav-links');
+  if (navLinks) navLinks.classList.remove('mobile-open');
 
-  /* ── 2. MENU MOBILE ── */
-  function toggleMenu() {
-    const navLinks = document.getElementById('nav-links');
-    if(navLinks) navLinks.classList.toggle('mobile-open');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+
+  const targetPage = document.getElementById('page-' + name);
+  const targetBtn  = document.getElementById('btn-' + name);
+  if (targetPage) targetPage.classList.add('visible');
+  if (targetBtn)  targetBtn.classList.add('active');
+
+  window.scrollTo({ top: 0 });
+  if (addHistory) history.pushState({ page: name }, '');
+}
+
+/* ── 2. MENU MOBILE ── */
+function toggleMenu() {
+  const navLinks = document.getElementById('nav-links');
+  if (navLinks) navLinks.classList.toggle('mobile-open');
+}
+
+/* ── 3. LIGHTBOX ── */
+function openLightbox(el) {
+  const activePage = document.querySelector('.page.visible');
+  allPosts  = Array.from(activePage.querySelectorAll('.grid-item[onclick]'));
+  postIndex = allPosts.indexOf(el);
+
+  loadPost(el);
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  history.pushState({ lbOpen: true }, '');
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('lightbox');
+  if (lb && lb.classList.contains('open')) {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    const video = lb.querySelector('video');
+    if (video) video.pause();
+    if (history.state && history.state.lbOpen) history.back();
   }
+}
 
-  /* ── 3. LIGHTBOX ── */
-  /* --- GESTIONE APERTURA POST --- */
-  /* --- APERTURA POST --- */
-  function openLightbox(el) {
-    const video = el.getAttribute('data-video');
-    const imgs = el.getAttribute('data-images');
-    const cap = el.getAttribute('data-caption');
+function loadPost(el) {
+  /* Immagini */
+  const raw = el.getAttribute('data-images') || '';
+  lbImages  = raw.split(',').map(s => s.trim()).filter(Boolean);
+  lbCurrent = 0;
 
-    const postData = {
-      video: video,
-      images: imgs ? imgs.split(',') : [],
-      caption: cap || ''
-    };
-
-    postIndex = allPosts.findIndex(p => 
-      (video && p.video === video) || (imgs && p.images.join(',') === imgs)
-    );
-
-    loadPost(postData); 
-    document.getElementById('lightbox').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    history.pushState({ lbOpen: true }, "");
-  }
-
-  /* --- CARICAMENTO CONTENUTO --- */
-  function loadPost(postData) {
-    const sliderWrap = document.getElementById('lb-slider-wrap'); // Ora il nome coincide!
-    const captionEl = document.getElementById('lb-caption');
+  const sliderWrap = document.getElementById('lb-slider-wrap');
+  if (sliderWrap) {
     sliderWrap.innerHTML = '';
-    captionEl.innerHTML = postData.caption;
-
-    if (postData.video) {
-      lbImages = [];
+    lbImages.forEach(src => {
       const slide = document.createElement('div');
-      slide.className = 'lb-slide active';
-      slide.innerHTML = `
-        <video src="${postData.video}" controls autoplay loop playsinline 
-               style="max-width:100%; max-height:80vh; border-radius:4px;">
-        </video>`;
+      slide.className = 'lb-slide';
+      const img = document.createElement('img');
+      img.src = src;
+      slide.appendChild(img);
       sliderWrap.appendChild(slide);
-    } else {
-      lbImages = postData.images;
-      lbCurrent = 0;
-      lbImages.forEach((src, idx) => {
-        const slide = document.createElement('div');
-        slide.className = 'lb-slide' + (idx === 0 ? ' active' : '');
-        const img = document.createElement('img');
-        img.src = src.trim();
-        slide.appendChild(img);
-        sliderWrap.appendChild(slide);
-      });
-      // Non serve lbShow() qui se usiamo la classe 'active' direttamente
-    }
-    if (typeof buildDots === "function") buildDots(); 
-  }
-
-  /* --- NAVIGAZIONE IMMAGINI (Destra/Sinistra) --- */
-  function lbShow() {
-    const slides = document.querySelectorAll('.lb-slide');
-    slides.forEach((s, i) => {
-      s.classList.toggle('active', i === lbCurrent);
     });
-    if (typeof buildDots === "function") buildDots();
+    sliderWrap.style.transform = 'translateX(0%)';
   }
 
-  function lbStep(dir) {
-    if (!lbImages.length) return;
-    lbCurrent = (lbCurrent + dir + lbImages.length) % lbImages.length;
-    lbShow();
+  /* Caption */
+  const captionText = el.getAttribute('data-caption') || '';
+  const captionEl   = document.getElementById('lb-caption');
+  const moreBtn     = document.getElementById('lb-more-btn');
+  if (captionEl) {
+    captionEl.innerHTML = captionText;
+    captionEl.classList.remove('expanded');
+  }
+  if (moreBtn) {
+    moreBtn.innerText = '...altro';
+    moreBtn.style.display =
+      (captionText.length > 50 && window.innerWidth <= 680) ? 'inline-block' : 'none';
   }
 
-  /* --- CHIUSURA --- */
-  function closeLightbox() {
-    const lb = document.getElementById('lightbox');
-    if (lb.classList.contains('open')) {
-      lb.classList.remove('open');
-      document.body.style.overflow = '';
-      const video = lb.querySelector('video');
-      if (video) video.pause();
-      if (history.state && history.state.lbOpen) history.back();
-    }
+  buildDots();
+  lbShow();
+}
+
+function postStep(dir) {
+  if (!allPosts.length) return;
+  postIndex = (postIndex + dir + allPosts.length) % allPosts.length;
+  loadPost(allPosts[postIndex]);
+
+  /* Effetto feed verticale solo su mobile */
+  if (window.innerWidth <= 680) {
+    const panel = document.querySelector('.lb-panel');
+    panel.classList.remove('swipe-up-active', 'swipe-down-active');
+    void panel.offsetWidth;
+    panel.classList.add(dir > 0 ? 'swipe-up-active' : 'swipe-down-active');
   }
+}
 
-  /* --- NUOVA FUNZIONE ESPANSIONE TESTO --- */
-  function toggleCaption() {
-    const cap = document.getElementById('lb-caption');
-    const btn = document.getElementById('lb-more-btn');
-    if (cap.classList.contains('expanded')) {
-      cap.classList.remove('expanded');
-      btn.innerText = '...altro';
-    } else {
-      cap.classList.add('expanded');
-      btn.innerText = 'nascondi';
-    }
-  }
+function lbStep(dir) {
+  if (!lbImages.length) return;
+  lbCurrent = (lbCurrent + dir + lbImages.length) % lbImages.length;
+  lbShow();
+}
 
-  function loadPost(el) {
-    const raw = el.getAttribute('data-images') || '';
-    lbImages = raw.split(',').map(s => s.trim()).filter(Boolean);
-    lbCurrent = 0;
-    if (!lbImages.length) return;
-    
-    // 1. GESTIONE DEL TESTO E DEL TASTO "...ALTRO"
-    const captionText = el.getAttribute('data-caption') || '';
-    const captionEl = document.getElementById('lb-caption');
-    const moreBtn = document.getElementById('lb-more-btn');
-    
-    if (captionEl) {
-      captionEl.innerHTML = captionText;
-      captionEl.classList.remove('expanded'); // Resetta a 3 righe
-    }
-    
-    if (moreBtn) {
-      moreBtn.innerText = '...altro';
-      if (captionText.length > 50 && window.innerWidth <= 680) {
-        moreBtn.style.display = 'inline-block';
-      } else {
-        moreBtn.style.display = 'none';
-      }
-    }
+function lbShow() {
+  const sliderWrap = document.getElementById('lb-slider-wrap');
+  if (!sliderWrap) return;
+  sliderWrap.style.transform = `translateX(-${lbCurrent * 100}%)`;
 
-    // 2. GESTIONE DELLE IMMAGINI (Questa è la parte che mancava!)
-    const sliderWrap = document.getElementById('lb-slider-wrap');
-    if (sliderWrap) {
-      sliderWrap.innerHTML = ''; // Svuota le foto del post precedente
-      
-      // Crea le nuove foto
-      lbImages.forEach(src => {
-        const slide = document.createElement('div');
-        slide.className = 'lb-slide';
-        const img = document.createElement('img');
-        img.src = src;
-        slide.appendChild(img);
-        sliderWrap.appendChild(slide);
-      });
-      
-      // Riporta il nastro alla prima foto
-      sliderWrap.style.transform = `translateX(0%)`;
-    }
+  const showArrows = lbImages.length > 1;
+  const prevBtn = document.querySelector('.lb-prev');
+  const nextBtn = document.querySelector('.lb-next');
+  if (prevBtn) prevBtn.style.display = showArrows ? '' : 'none';
+  if (nextBtn) nextBtn.style.display = showArrows ? '' : 'none';
 
-    buildDots();
-    lbShow();
-  }
+  document.querySelectorAll('.lb-dot')
+    .forEach((d, i) => d.classList.toggle('active', i === lbCurrent));
+}
 
-  function postStep(dir) {
-    if (!allPosts.length) return;
-    postIndex = (postIndex + dir + allPosts.length) % allPosts.length;
-    loadPost(allPosts[postIndex]);
-
-    // --- MAGIA PER L'EFFETTO FEED SOLO SU MOBILE ---
-    if (window.innerWidth <= 680) {
-      const panel = document.querySelector('.lb-panel');
-      
-      // 1. Spengo le animazioni precedenti
-      panel.classList.remove('swipe-up-active', 'swipe-down-active');
-      
-      // 2. Un trucchetto tecnico per far ripartire l'animazione da zero
-      void panel.offsetWidth; 
-      
-      // 3. Accendo l'animazione giusta in base a dove hai mosso il dito
-      if (dir > 0) {
-        panel.classList.add('swipe-up-active'); // Dito verso l'alto = sale un nuovo post
-      } else {
-        panel.classList.add('swipe-down-active'); // Dito verso il basso = scende il post vecchio
-      }
-    }
-  }
-
-  function lbStep(dir) {
-    if (!lbImages.length) return;
-    lbCurrent = (lbCurrent + dir + lbImages.length) % lbImages.length;
-    lbShow();
-  }
-
-  function lbShow() {
-    /* --- NUOVO CODICE SCORRIMENTO --- */
-    const sliderWrap = document.getElementById('lb-slider-wrap');
-    sliderWrap.style.transform = `translateX(-${lbCurrent * 100}%)`;
-
-    const showArrows = lbImages.length > 1;
-    document.querySelector('.lb-prev').style.display = showArrows ? '' : 'none';
-    document.querySelector('.lb-next').style.display = showArrows ? '' : 'none';
-    document.querySelectorAll('.lb-dot').forEach((d, i) => d.classList.toggle('active', i === lbCurrent));
-  }
-
-  function buildDots() {
-    const wrap = document.getElementById('lb-dots');
-    wrap.innerHTML = '';
-    if (lbImages.length <= 1) return;
-    lbImages.forEach((_, i) => {
-      const d = document.createElement('div');
-      d.className = 'lb-dot' + (i === 0 ? ' active' : '');
-      d.onclick = e => { e.stopPropagation(); lbCurrent = i; lbShow(); };
-      wrap.appendChild(d);
-    });
-  }
-
-  /* ── 4. EVENTI (INDIETRO, CLICK FUORI) ── */
-  window.addEventListener('load', () => {
-    if (!history.state) history.replaceState({ page: 'lavori' }, "");
+function buildDots() {
+  const wrap = document.getElementById('lb-dots');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  if (lbImages.length <= 1) return;
+  lbImages.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'lb-dot' + (i === 0 ? ' active' : '');
+    d.onclick = e => { e.stopPropagation(); lbCurrent = i; lbShow(); };
+    wrap.appendChild(d);
   });
+}
 
-  window.addEventListener('popstate', (event) => {
-    const lb = document.getElementById('lightbox');
-    if (lb && lb.classList.contains('open')) {
-      lb.classList.remove('open');
-      document.body.style.overflow = '';
-      return; 
-    }
-    if (event.state && event.state.page) showPage(event.state.page, false);
-    else showPage('lavori', false);
-  });
-
-  document.getElementById('lb-main').addEventListener('click', function(e) {
-      // Chiude se clicchi sullo sfondo del contenitore o sulle fasce nere delle slide
-      if (e.target.id === 'lb-main' || e.target.classList.contains('lb-slide')) {
-        closeLightbox();
-      }
-    });
-
-  /* ── 5. TOUCH & TASTIERA ── */
-
-  // Imposta --app-height = altezza viewport reale, aggiornata ad ogni resize.
-  // Soluzione cross-browser: sostituisce "dvh" che non funziona su Android vecchi.
-  function setAppHeight() {
-    document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+function toggleCaption() {
+  const cap = document.getElementById('lb-caption');
+  const btn = document.getElementById('lb-more-btn');
+  if (cap.classList.contains('expanded')) {
+    cap.classList.remove('expanded');
+    btn.innerText = '...altro';
+  } else {
+    cap.classList.add('expanded');
+    btn.innerText = 'nascondi';
   }
-  setAppHeight();
-  window.addEventListener('resize', setAppHeight);
+}
 
-  let touchStartX = 0;
-  let touchStartY = 0;
+/* ── 4. EVENTI ── */
+window.addEventListener('load', () => {
+  if (!history.state) history.replaceState({ page: 'lavori' }, '');
+});
 
-  // non-passive: così preventDefault() blocca pull-to-refresh su Chrome Android
-  document.getElementById('lb-main').addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-  }, { passive: false });
+window.addEventListener('popstate', event => {
+  const lb = document.getElementById('lightbox');
+  if (lb && lb.classList.contains('open')) {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    return;
+  }
+  if (event.state && event.state.page) showPage(event.state.page, false);
+  else showPage('lavori', false);
+});
 
-  // Blocca TUTTI i touchmove quando la lightbox è aperta:
-  // impedisce pull-to-refresh e overscroll su qualsiasi dispositivo
-  document.getElementById('lightbox').addEventListener('touchmove', e => {
-    if (document.getElementById('lightbox').classList.contains('open')) {
-      e.preventDefault();
-    }
-  }, { passive: false });
+document.getElementById('lb-main').addEventListener('click', function(e) {
+  if (e.target.id === 'lb-main' || e.target.classList.contains('lb-slide')) {
+    closeLightbox();
+  }
+});
 
-  document.getElementById('lb-main').addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    const dy = e.changedTouches[0].clientY - touchStartY;
-    const threshold = 50;
+/* ── 5. TOUCH & TASTIERA ── */
 
-    if (Math.abs(dx) > Math.abs(dy)) {
-      if (Math.abs(dx) > threshold) lbStep(dx < 0 ? 1 : -1);
-    } else {
-      if (Math.abs(dy) > threshold) postStep(dy < 0 ? 1 : -1);
-    }
-  });
+/* --app-height: altezza viewport reale (cross-browser, sostituisce dvh) */
+function setAppHeight() {
+  document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+}
+setAppHeight();
+window.addEventListener('resize', setAppHeight);
 
-  document.addEventListener('keydown', e => {
-    if (!document.getElementById('lightbox').classList.contains('open')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowRight') lbStep(1);
-    if (e.key === 'ArrowLeft') lbStep(-1);
-    if (e.key === 'ArrowUp') postStep(-1);
-    if (e.key === 'ArrowDown') postStep(1);
-  
-  // Blocca il menù del tasto destro su tutto il sito
-  document.addEventListener('contextmenu', function(e) {
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.getElementById('lb-main').addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: false });
+
+/* Blocca pull-to-refresh e overscroll quando la lightbox è aperta */
+document.getElementById('lightbox').addEventListener('touchmove', e => {
+  if (document.getElementById('lightbox').classList.contains('open')) {
     e.preventDefault();
-  }, false);
+  }
+}, { passive: false });
 
-  });
+document.getElementById('lb-main').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  const threshold = 50;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (Math.abs(dx) > threshold) lbStep(dx < 0 ? 1 : -1);
+  } else {
+    if (Math.abs(dy) > threshold) postStep(dy < 0 ? 1 : -1);
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape')      closeLightbox();
+  if (e.key === 'ArrowRight')  lbStep(1);
+  if (e.key === 'ArrowLeft')   lbStep(-1);
+  if (e.key === 'ArrowUp')     postStep(-1);
+  if (e.key === 'ArrowDown')   postStep(1);
+});
+
+/* Blocca menu tasto destro su tutto il sito */
+document.addEventListener('contextmenu', e => e.preventDefault(), false);
+
 </script>
 </body>
 </html>
