@@ -400,27 +400,33 @@
 
     /* su mobile: sidebar va sotto l'immagine e layout stile Instagram */
     @media (max-width: 680px) {
-      /* Il pannello ora è un contenitore flessibile che centra il contenuto */
+      /* La lightbox clippa l'animazione di swipe al bordo dello schermo */
+      .lightbox {
+        overflow: hidden;
+      }
+
+      /* Il pannello copre l'intero schermo con sfondo solido — niente griglie visibili sotto */
       .lb-panel {
         flex-direction: column;
         width: 100vw;
-        height: 100vh;
+        height: 100dvh; /* dvh per gestire la barra URL dei browser mobile */
         border-radius: 0;
-        background: transparent; /* Sfondo trasparente per far risaltare la foto */
-        justify-content: center; /* CENTRA TUTTO VERTICALMENTE */
+        background: #000; /* Solido: nessuna anteprima visibile durante lo swipe */
+        justify-content: flex-start; /* Layout dall'alto verso il basso */
         align-items: center;
+        overflow: hidden;
       }
 
-      /* La colonna immagine ora si adatta al centro */
+      /* La colonna immagine occupa tutto lo spazio disponibile sopra la sidebar */
       .lb-img-col {
         width: 100%;
-        flex: 0 0 auto;
+        flex: 1 1 auto; /* Si espande per riempire tutto lo spazio */
+        min-height: 0;
         height: auto;
-        max-height: 65vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        position: relative; /* <--- Importante: serve a fare da base per i pallini */
+        position: relative;
         background: #000;
       }
 
@@ -428,31 +434,23 @@
         display: flex;
         flex-direction: row;
         gap: 8px;
-        position: absolute; /* <--- Ora galleggiano sopra la foto */
-        bottom: 15px;       /* Distanza dal fondo della foto */
+        position: absolute;
+        bottom: 15px;
         left: 50%;
         transform: translateX(-50%);
         z-index: 10;
-        background: rgba(0,0,0,0.2); /* Un leggero ombra per vederli meglio sulle foto chiare */
+        background: rgba(0,0,0,0.2);
         padding: 5px 10px;
         border-radius: 20px;
       }
 
-      .lb-sidebar {
-        width: 100%;
-        flex: 0 0 auto;
-        padding: 1rem 1.2rem;
-        background: var(--bg);
-        margin-top: 0; /* <--- Attacca la descrizione alla foto */
-      }
-
-      /* La descrizione sta sotto, ben staccata */
+      /* Sidebar fissa in altezza così la foto sopra si adatta */
       .lb-sidebar {
         width: 100%;
         flex: 0 0 auto;
         padding: 1.5rem 1.2rem;
-        background: var(--bg); /* Il fondo nero torna solo qui sotto */
-        border-top: none;
+        background: var(--bg);
+        border-top: 1px solid rgba(255,255,255,0.06);
       }
 
       .lb-caption-wrapper {
@@ -477,7 +475,7 @@
         margin-top: 4px;
         align-self: flex-start;
       }
-      /* Mantiene i pallini ancorati al fondo della foto (sovrapposti) */
+      /* Pallini leggermente più su */
       .lb-dots {
         bottom: 12px;
       }
@@ -653,28 +651,28 @@
       .nav-links button { width: 100%; padding: 1.2rem 2rem; text-align: left; }
     }
 
-     /* ══════════════════════════════════════════
+    /* ══════════════════════════════════════════
      EFFETTO FEED VERTICALE (SOLO SU MOBILE)
      ══════════════════════════════════════════ */
     @media (max-width: 680px) {
       /* Animazione per quando scorri il dito in SU (prossimo post) */
       @keyframes slideUpFeed {
-        0% { transform: translateY(100vh); opacity: 0.5; }
-        100% { transform: translateY(0); opacity: 1; }
+        0%   { transform: translateY(100vh); opacity: 0.6; }
+        100% { transform: translateY(0);     opacity: 1;   }
       }
   
       /* Animazione per quando scorri il dito in GIÙ (post precedente) */
       @keyframes slideDownFeed {
-        0% { transform: translateY(-100vh); opacity: 0.5; }
-        100% { transform: translateY(0); opacity: 1; }
+        0%   { transform: translateY(-100vh); opacity: 0.6; }
+        100% { transform: translateY(0);      opacity: 1;   }
       }
 
       /* Classi che il Javascript applicherà come "interruttori" */
       .swipe-up-active {
-        animation: slideUpFeed 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        animation: slideUpFeed 0.38s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
       }
       .swipe-down-active {
-        animation: slideDownFeed 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        animation: slideDownFeed 0.38s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
       }
     }
   </style>
