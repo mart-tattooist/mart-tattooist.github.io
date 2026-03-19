@@ -327,8 +327,13 @@
       transform: scale(1.2);
     }
 
-    /* Swipe touch */
-    .lb-img-col { touch-action: pan-y; }
+    /* Swipe touch — su mobile gestiamo tutto via JS, nessun pan nativo */
+    .lb-img-col { touch-action: pan-x; }
+    @media (max-width: 680px) {
+      /* CRITICO: "none" impedisce al browser di intercettare i gesti verticali
+         ed elimina il pull-to-refresh di Chrome/Safari */
+      .lb-img-col { touch-action: none; }
+    }
 
     /* ── Colonna destra: testo descrittivo ── */
     .lb-sidebar {
@@ -400,9 +405,10 @@
 
     /* su mobile: sidebar va sotto l'immagine e layout stile Instagram */
     @media (max-width: 680px) {
-      /* La lightbox clippa l'animazione di swipe al bordo dello schermo */
+      /* Clippa l'animazione di swipe E blocca overscroll/pull-to-refresh */
       .lightbox {
         overflow: hidden;
+        overscroll-behavior: none;
       }
 
       /* Il pannello copre l'intero schermo con sfondo solido — niente griglie visibili sotto */
@@ -767,18 +773,7 @@
 
     <div class="grid-item" 
        data-images="cervoniglio-01.jpg,cervoniglio-02.jpg,cervoniglio-03.jpg,cervoniglio-04.jpg,cervoniglio-05.jpg,cervoniglio-06.jpg,cervoniglio-07.jpg,cervoniglio-08.jpg,cervoniglio-09.jpg" 
-       data-caption="Per fare questo disegno il più realistico possibile sono andato in macelleria a chiedere… solo la testa di un coniglio.
-
-       Il macellaio mi guarda malissimo e fa:
-       &quot;Scusa, ma cosa ci devi fare?&quot;
-       
-       Io, tranquillo:
-       &quot;Un disegno!&quot;
-       
-       Silenzio.
-       Sguardo ancora peggiore.
-       
-       Alla fine me l’ha data e non me l’ha fatta nemmeno pagare ☠️"
+       data-caption="Per fare questo disegno il più realistico possibile sono andato in macelleria a chiedere… solo la testa di un coniglio. <br>Il macellaio mi guarda malissimo e fa: <br>&quot;Scusa, ma cosa ci devi fare?&quot; <br>Io, tranquillo: <br>&quot;Un disegno!&quot; <br>Silenzio. <br>Sguardo ancora peggiore. <br>Alla fine me l’ha data e non me l’ha fatta nemmeno pagare ☠️"
        onclick="openLightbox(this)">
       <img src="cervoniglio-01.jpg" alt="Teschio di un coniglio con un corno">
       <div class="grid-overlay"></div>
@@ -952,7 +947,7 @@
 
     <div class="flash-wrap"> 
       <div class="grid-item" 
-           data-images="flash-004.jpg,cervoniglio-05" 
+           data-images="flash-004.jpg,cervoniglio-05.jpg" 
            data-caption="Dimensione minima 15cm.<br><strong>Prenotato</strong>" 
            onclick="openLightbox(this)">
           <img src="flash-004.jpg" alt="Flash 004"> 
@@ -1500,10 +1495,21 @@ let lbImages = [];
   /* ── 5. TOUCH & TASTIERA ── */
   let touchStartX = 0;
   let touchStartY = 0;
+
+  // NON passive: così possiamo chiamare preventDefault() e bloccare il pull-to-refresh
   document.getElementById('lb-main').addEventListener('touchstart', e => {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
-  }, { passive: true });
+  }, { passive: false });
+
+  // BLOCCA pull-to-refresh e overscroll del browser quando la lightbox è aperta.
+  // DEVE essere non-passive per poter chiamare preventDefault().
+  const lightboxEl = document.getElementById('lightbox');
+  lightboxEl.addEventListener('touchmove', e => {
+    if (lightboxEl.classList.contains('open')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
 
   document.getElementById('lb-main').addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
