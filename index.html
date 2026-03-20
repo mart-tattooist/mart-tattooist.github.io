@@ -285,14 +285,23 @@
       object-fit: contain; /* Mantiene la foto intera senza tagliarla o rimpicciolirla troppo */
     }
 
+    /* Stato disponibile/prenotato dentro la caption della lightbox */
+    #lb-caption .available-label {
+      font-size: 0.78rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #72b98a; font-weight: 500;
+    }
+    #lb-caption .taken-label {
+      font-size: 0.78rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); font-weight: 400;
+    }
+
     /* Frecce INTERNE al post — solo chevron, nessun bollo */
     .lb-btn {
-      position: absolute;
-      top: 0; bottom: 0;
+      position: absolute; top: 50%; transform: translateY(-50%);
       background: none;
       border: none;
       color: rgba(255,255,255,0.85);
-      width: 52px;
+      width: 32px; height: 32px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       font-size: 1.6rem;
@@ -303,8 +312,8 @@
       text-shadow: 0 1px 6px rgba(0,0,0,0.7);
     }
     .lb-btn:hover { color: #fff; }
-    .lb-prev { left: 0; }
-    .lb-next { right: 0; }
+    .lb-prev { left: 0.5rem; }
+    .lb-next { right: 0.5rem; }
 
     /* Dots — desktop: assoluti in basso sull'area immagine
        (lb-panel è position:relative; sidebar larga 260px è a destra) */
@@ -900,7 +909,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-006.jpg" 
-           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
+           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
            onclick="openLightbox(this)">
           <img src="flash-006.jpg" alt="Flash 006"> 
           <div class="grid-overlay"></div> 
@@ -913,7 +922,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-005.jpg" 
-           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
+           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
            onclick="openLightbox(this)">
           <img src="flash-005.jpg" alt="Flash 005"> 
           <div class="grid-overlay"></div> 
@@ -926,7 +935,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-004.jpg,cervoniglio-05.jpg" 
-           data-caption="Dimensione minima 15cm.<br><strong>Prenotato</strong>" 
+           data-caption="Dimensione minima 15cm.<br><span class='taken-label'>✕ Prenotato</span>" 
            onclick="openLightbox(this)">
           <img src="flash-004.jpg" alt="Flash 004"> 
           <div class="grid-overlay">
@@ -946,7 +955,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-003.jpg" 
-           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
+           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
            onclick="openLightbox(this)">
           <img src="flash-003.jpg" alt="Flash 003"> 
           <div class="grid-overlay"></div> 
@@ -959,7 +968,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-002.jpg" 
-           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
+           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
            onclick="openLightbox(this)">
           <img src="flash-002.jpg" alt="Flash 002"> 
           <div class="grid-overlay"></div> 
@@ -972,7 +981,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-001.jpg" 
-           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
+           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
            onclick="openLightbox(this)">
           <img src="flash-001.jpg" alt="Flash 001"> 
           <div class="grid-overlay"></div> 
