@@ -399,12 +399,28 @@
       .lb-post-prev, .lb-post-next { display: none; }
     }
 
-    /* ══════════════════════════════════════════
-       LAYOUT MOBILE LIGHTBOX — stile IG feed
-       Compatibile con tutti i browser/dispositivi
-       (usa --app-height settato via JS invece di dvh)
-    ══════════════════════════════════════════ */
+    /* --- Aumento area di tocco frecce galleria su mobile --- */
     @media (max-width: 680px) {
+     .lb-btn {
+        height: 100% !important;   /* Copre tutta l'altezza dell'immagine */
+        top: 0 !important;         /* Parte dall'alto */
+        transform: none !important; /* Toglie il vecchio posizionamento centrale */
+        width: 75px;               /* Area di tocco laterale molto comoda */
+        display: flex;
+        align-items: center;       /* Icona centrata verticalmente nell'area grande */
+        z-index: 20;               /* Sopra l'immagine */
+      }
+
+   /* Posizionamento delle icone < e > */
+     .lb-prev { 
+        padding-left: 15px; 
+        justify-content: flex-start; 
+      }
+     .lb-next { 
+        padding-right: 15px; 
+        justify-content: flex-end; 
+      }
+    }
 
       /* Blocca overscroll/pull-to-refresh sul pannello */
       .lightbox {
@@ -798,7 +814,7 @@
        data-images="polipo-nobile-01.jpg,polipo-nobile-02.jpg,polipo-nobile-03.jpg,polipo-nobile-04.jpg,polipo-nobile-05.jpg" 
        data-caption="I polpi sono incredibili cefalopodi marini noti per avere tre cuori, sangue blu e otto braccia dotate di &quot;mini-cervelli&quot; autonomi, braccia, non tentacoli! <br>Solitamente il terzo braccio destro è più corto, presenta una punta spatolata ed è chiamato ectocotile e sì, è il CATZO del polipo :)<br>Sapevatelo!"
        onclick="openLightbox(this)">
-       <img src="polipo-nobile-01.jpg" alt="Primo piano di un polpo nobile con cilindro e monocolo">
+       <img src="polipo-nobile-01.jpg" alt="Tatuaggio in bianco e nero raffigurante un'antica nave a vela con lo scafo a forma di conchiglia marina, realizzato con tecnica dotwork"
       <div class="grid-overlay"></div>
     </div>
 
