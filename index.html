@@ -213,62 +213,20 @@
       text-transform: uppercase; color: var(--muted); text-decoration: line-through;
     }
 
-    /* ── Play/Pause overlay sul video nella lightbox ── */
-    .lb-slide { position: relative; }
-    .lb-video-overlay {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      z-index: 5;
-    }
-    .lb-play-btn {
-      width: 56px; height: 56px;
-      border: 1.5px solid rgba(255,255,255,0.75);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.28);
-      backdrop-filter: blur(4px);
-      transition: opacity 0.22s, transform 0.22s;
+    /* ── Barra progresso video (stile Reel) ── */
+    .lb-video-progress {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 2px;
+      background: rgba(255,255,255,0.18);
+      z-index: 6;
       pointer-events: none;
     }
-    .lb-play-btn svg {
-      width: 20px; height: 20px;
-      fill: rgba(255,255,255,0.9);
-      margin-left: 3px;
-    }
-    .lb-video-overlay.hidden { opacity: 0; pointer-events: none; }
-    .lb-video-overlay:not(.hidden):hover .lb-play-btn {
-      transform: scale(1.1);
-      border-color: #fff;
-    }
-
-    /* ── Play/Pause overlay sul video nella lightbox ── */
-    .lb-slide { position: relative; }
-    .lb-video-overlay {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      z-index: 5;
-    }
-    .lb-play-btn {
-      width: 56px; height: 56px;
-      border: 1.5px solid rgba(255,255,255,0.75);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.28);
-      backdrop-filter: blur(4px);
-      transition: opacity 0.22s, transform 0.22s;
-      pointer-events: none;
-    }
-    .lb-play-btn svg {
-      width: 20px; height: 20px;
-      fill: rgba(255,255,255,0.9);
-      margin-left: 3px;
-    }
-    .lb-video-overlay.hidden { opacity: 0; pointer-events: none; }
-    .lb-video-overlay:not(.hidden):hover .lb-play-btn {
-      transform: scale(1.1);
-      border-color: #fff;
+    .lb-video-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: none;
     }
 
     /* ══════════════════════════════════════════
@@ -1428,48 +1386,9 @@ function loadPost(el) {
     lbImages.forEach(src => {
       const slide = document.createElement('div');
       slide.className = 'lb-slide';
-      const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(src);
-      if (isVideo) {
-        const vid = document.createElement('video');
-        vid.src = src;
-        vid.playsInline = true;
-        vid.loop = true;
-        vid.style.cssText = 'max-width:100%;max-height:100%;outline:none;display:block;';
-        slide.appendChild(vid);
-
-        /* Overlay play/pausa */
-        const overlay = document.createElement('div');
-        overlay.className = 'lb-video-overlay';
-        overlay.innerHTML = '<div class="lb-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>';
-        overlay.addEventListener('click', function(e) {
-          e.stopPropagation();
-          if (vid.paused) {
-            vid.play();
-            overlay.classList.add('hidden');
-          } else {
-            vid.pause();
-            overlay.classList.remove('hidden');
-          }
-        });
-        vid.addEventListener('click', function(e) {
-          e.stopPropagation();
-          if (vid.paused) {
-            vid.play();
-            overlay.classList.add('hidden');
-          } else {
-            vid.pause();
-            overlay.classList.remove('hidden');
-          }
-        });
-        vid.addEventListener('ended', function() {
-          overlay.classList.remove('hidden');
-        });
-        slide.appendChild(overlay);
-      } else {
-        const img = document.createElement('img');
-        img.src = src;
-        slide.appendChild(img);
-      }
+      const img = document.createElement('img');
+      img.src = src;
+      slide.appendChild(img);
       sliderWrap.appendChild(slide);
     });
     sliderWrap.style.transform = 'translateX(0%)';
@@ -1516,6 +1435,14 @@ function lbStep(dir) {
 function lbShow() {
   const sliderWrap = document.getElementById('lb-slider-wrap');
   if (!sliderWrap) return;
+
+  /* Pausa tutti i video e mostra di nuovo il play overlay */
+  sliderWrap.querySelectorAll('video').forEach(v => {
+    v.pause();
+    const overlay = v.closest('.lb-slide').querySelector('.lb-video-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+  });
+
   sliderWrap.style.transform = `translateX(-${lbCurrent * 100}%)`;
 
   const showArrows = lbImages.length > 1;
