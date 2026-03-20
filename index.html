@@ -1386,9 +1386,50 @@ function loadPost(el) {
     lbImages.forEach(src => {
       const slide = document.createElement('div');
       slide.className = 'lb-slide';
-      const img = document.createElement('img');
-      img.src = src;
-      slide.appendChild(img);
+      const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(src);
+      if (isVideo) {
+        const vid = document.createElement('video');
+        vid.src = src;
+        vid.playsInline = true;
+        vid.loop = true;
+        vid.style.cssText = 'max-width:100%;max-height:100%;outline:none;display:block;';
+        slide.appendChild(vid);
+
+        /* Barra progresso */
+        const progBar = document.createElement('div');
+        progBar.className = 'lb-video-progress';
+        const progFill = document.createElement('div');
+        progFill.className = 'lb-video-progress-fill';
+        progBar.appendChild(progFill);
+        slide.appendChild(progBar);
+        let rafId = null;
+        function updateProgress() {
+          if (vid.duration) progFill.style.width = (vid.currentTime / vid.duration * 100) + '%';
+          if (!vid.paused && !vid.ended) rafId = requestAnimationFrame(updateProgress);
+        }
+        vid.addEventListener('play',  () => { rafId = requestAnimationFrame(updateProgress); });
+        vid.addEventListener('pause', () => { cancelAnimationFrame(rafId); });
+        vid.addEventListener('ended', () => { cancelAnimationFrame(rafId); progFill.style.width = '0%'; });
+
+        /* Overlay play/pausa */
+        const overlay = document.createElement('div');
+        overlay.className = 'lb-video-overlay';
+        overlay.innerHTML = '<div class="lb-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>';
+        function togglePlay(e) {
+          e.stopPropagation();
+          if (vid.paused) { vid.play(); overlay.classList.add('hidden'); }
+          else            { vid.pause(); overlay.classList.remove('hidden'); }
+        }
+        overlay.addEventListener('click', togglePlay);
+        vid.addEventListener('click', togglePlay);
+        vid.addEventListener('ended', () => overlay.classList.remove('hidden'));
+        slide.appendChild(overlay);
+
+      } else {
+        const img = document.createElement('img');
+        img.src = src;
+        slide.appendChild(img);
+      }
       sliderWrap.appendChild(slide);
     });
     sliderWrap.style.transform = 'translateX(0%)';
