@@ -213,6 +213,64 @@
       text-transform: uppercase; color: var(--muted); text-decoration: line-through;
     }
 
+    /* ── Play/Pause overlay sul video nella lightbox ── */
+    .lb-slide { position: relative; }
+    .lb-video-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .lb-play-btn {
+      width: 56px; height: 56px;
+      border: 1.5px solid rgba(255,255,255,0.75);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.22s, transform 0.22s;
+      pointer-events: none;
+    }
+    .lb-play-btn svg {
+      width: 20px; height: 20px;
+      fill: rgba(255,255,255,0.9);
+      margin-left: 3px;
+    }
+    .lb-video-overlay.hidden { opacity: 0; pointer-events: none; }
+    .lb-video-overlay:not(.hidden):hover .lb-play-btn {
+      transform: scale(1.1);
+      border-color: #fff;
+    }
+
+    /* ── Play/Pause overlay sul video nella lightbox ── */
+    .lb-slide { position: relative; }
+    .lb-video-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .lb-play-btn {
+      width: 56px; height: 56px;
+      border: 1.5px solid rgba(255,255,255,0.75);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.22s, transform 0.22s;
+      pointer-events: none;
+    }
+    .lb-play-btn svg {
+      width: 20px; height: 20px;
+      fill: rgba(255,255,255,0.9);
+      margin-left: 3px;
+    }
+    .lb-video-overlay.hidden { opacity: 0; pointer-events: none; }
+    .lb-video-overlay:not(.hidden):hover .lb-play-btn {
+      transform: scale(1.1);
+      border-color: #fff;
+    }
+
     /* ══════════════════════════════════════════
        LIGHTBOX con immagine grande + thumbnails
     ══════════════════════════════════════════ */
@@ -1065,22 +1123,58 @@
 
   <!--
   ══════════════════════════════════════════════════════════════════
-  VIDEO: inserisci sempre il più recente IN CIMA.
-  Struttura: data-images="copertina.jpg,video.mp4"
-  La copertina appare in griglia; cliccando si apre la lightbox
-  con la copertina e poi il video riproducibile.
+  VIDEO: stessa logica della pagina Flash ma senza etichette.
+  Inserisci sempre il più recente IN CIMA.
+  Usa data-images per immagini statiche (copertina video),
+  oppure data-caption per una descrizione.
   ══════════════════════════════════════════════════════════════════
   -->
   <div class="insta-grid">
 
-    <!-- ★ PIÙ RECENTE — metti sempre qui sopra -->
+    <div class="flash-wrap">
+      <div class="grid-item" 
+           data-images="copertina-video-001.jpg,REEL-tutto-d'un-fiato.mp4,flash-002.jpg" 
+           data-caption="SCRIVI QUI IL TUO TESTO — <a href='https://www.instagram.com/reel/DTC0hWdDACg/' target='_blank' style='color:var(--accent); text-decoration:underline;'>Guarda su Instagram</a>" 
+           onclick="openLightbox(this)">
+        
+        <img src="copertina-video-001.jpg" alt="Video Reel" style="display: block !important;">
+    
+        <div class="grid-overlay">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+      </div>
+      
+      <div class="flash-meta">
+        <span class="available-label">Video Reel</span>
+      </div>
+    </div>
 
     <div class="flash-wrap">
-      <div class="grid-item"
-           data-images="copertina-video-001.jpg,REEL-tutto-d'un-fiato.mp4"
-           data-caption="Tutto d'un fiato 🖤"
-           onclick="openLightbox(this)">
+      <a href="https://www.instagram.com/reel/DTC0hWdDACg/" target="_blank" class="grid-item">
+        
         <img src="copertina-video-001.jpg" alt="Video Reel">
+    
+        <div class="grid-overlay">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+      </a>
+      <div class="flash-meta">
+        <span class="available-label">Guarda su Instagram</span>
+      </div>
+    </div>
+
+    <div class="flash-wrap">
+      <div class="grid-item" 
+           data-images="REEL-tutto-d'un-fiato.mp4" 
+           data-caption="Video Reel — <a href='https://www.instagram.com/reel/DTC0hWdDACg/' target='_blank' style='color:var(--accent); text-decoration:underline;'>Guarda su Instagram</a>" 
+           onclick="openLightbox(this)">
+        
+        <img src="copertina-video-001.jpg" alt="Video Reel" style="display: block !important;">
+    
         <div class="grid-overlay">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <polygon points="5 3 19 12 5 21 5 3"/>
@@ -1088,7 +1182,72 @@
         </div>
       </div>
       <div class="flash-meta">
-        <span class="available-label">▶ Tutto d'un fiato</span>
+        <span class="available-label">Video Reel</span>
+      </div>
+    </div>
+
+    <div class="flash-wrap">
+      <a href="REEL-tutto-d'un-fiato.mp4" target="_blank" class="grid-item">
+        
+        <img src="copertina-video-001.jpg" alt="Video Reel">
+    
+        <div class="grid-overlay">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+      </a>
+      <div class="flash-meta">
+        <span class="available-label">Guarda su Instagram</span>
+      </div>
+    </div>
+
+    <div class="flash-wrap">
+      <div class="grid-item" 
+           data-video="REEL-tutto-d'un-fiato.mp4" 
+           data-caption="Video Reel: Tutto d'un fiato" 
+           onclick="openLightbox(this)">
+        
+        <img src="copertina-video-001.jpg" alt="Video Reel">
+    
+        <div class="grid-overlay">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+      </div>
+      <div class="flash-meta">
+        <span class="available-label">Guarda il Reel</span>
+      </div>
+    </div>
+
+    <div class="grid-item" data-images="video4.jpg" onclick="openLightbox(this)">
+      <div class="grid-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Video 4
+      </div>
+      <div class="grid-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+    </div>
+
+    <div class="grid-item" data-images="video5.jpg" onclick="openLightbox(this)">
+      <div class="grid-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Video 5
+      </div>
+      <div class="grid-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+    </div>
+
+    <div class="grid-item" data-images="video6.jpg" onclick="openLightbox(this)">
+      <div class="grid-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Video 6
+      </div>
+      <div class="grid-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       </div>
     </div>
 
@@ -1273,12 +1432,39 @@ function loadPost(el) {
       if (isVideo) {
         const vid = document.createElement('video');
         vid.src = src;
-        vid.controls = true;
-        vid.autoplay = true;
         vid.playsInline = true;
         vid.loop = true;
-        vid.style.cssText = 'max-width:100%;max-height:100%;outline:none;';
+        vid.style.cssText = 'max-width:100%;max-height:100%;outline:none;display:block;';
         slide.appendChild(vid);
+
+        /* Overlay play/pausa */
+        const overlay = document.createElement('div');
+        overlay.className = 'lb-video-overlay';
+        overlay.innerHTML = '<div class="lb-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>';
+        overlay.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (vid.paused) {
+            vid.play();
+            overlay.classList.add('hidden');
+          } else {
+            vid.pause();
+            overlay.classList.remove('hidden');
+          }
+        });
+        vid.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (vid.paused) {
+            vid.play();
+            overlay.classList.add('hidden');
+          } else {
+            vid.pause();
+            overlay.classList.remove('hidden');
+          }
+        });
+        vid.addEventListener('ended', function() {
+          overlay.classList.remove('hidden');
+        });
+        slide.appendChild(overlay);
       } else {
         const img = document.createElement('img');
         img.src = src;
