@@ -285,16 +285,6 @@
       object-fit: contain; /* Mantiene la foto intera senza tagliarla o rimpicciolirla troppo */
     }
 
-    /* Stato disponibile/prenotato dentro la caption della lightbox */
-    #lb-caption .available-label {
-      font-size: 0.78rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: #72b98a; font-weight: 500;
-    }
-    #lb-caption .taken-label {
-      font-size: 0.78rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--muted); font-weight: 400;
-    }
-
     /* Frecce INTERNE al post — solo chevron, nessun bollo */
     .lb-btn {
       position: absolute; top: 50%; transform: translateY(-50%);
@@ -909,7 +899,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-006.jpg" 
-           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
+           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
            onclick="openLightbox(this)">
           <img src="flash-006.jpg" alt="Flash 006"> 
           <div class="grid-overlay"></div> 
@@ -922,7 +912,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-005.jpg" 
-           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
+           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
            onclick="openLightbox(this)">
           <img src="flash-005.jpg" alt="Flash 005"> 
           <div class="grid-overlay"></div> 
@@ -935,7 +925,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-004.jpg,cervoniglio-05.jpg" 
-           data-caption="Dimensione minima 15cm.<br><span class='taken-label'>✕ Prenotato</span>" 
+           data-caption="Dimensione minima 15cm.<br><strong>Prenotato</strong>" 
            onclick="openLightbox(this)">
           <img src="flash-004.jpg" alt="Flash 004"> 
           <div class="grid-overlay">
@@ -955,7 +945,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-003.jpg" 
-           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
+           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
            onclick="openLightbox(this)">
           <img src="flash-003.jpg" alt="Flash 003"> 
           <div class="grid-overlay"></div> 
@@ -968,7 +958,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-002.jpg" 
-           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
+           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
            onclick="openLightbox(this)">
           <img src="flash-002.jpg" alt="Flash 002"> 
           <div class="grid-overlay"></div> 
@@ -981,7 +971,7 @@
     <div class="flash-wrap"> 
       <div class="grid-item" 
            data-images="flash-001.jpg" 
-           data-caption="Dimensione minima 15cm.<br><span class='available-label'>● Disponibile</span>" 
+           data-caption="Dimensione minima 15cm.<br><strong>Disponibile</strong>" 
            onclick="openLightbox(this)">
           <img src="flash-001.jpg" alt="Flash 001"> 
           <div class="grid-overlay"></div> 
@@ -1075,58 +1065,22 @@
 
   <!--
   ══════════════════════════════════════════════════════════════════
-  VIDEO: stessa logica della pagina Flash ma senza etichette.
-  Inserisci sempre il più recente IN CIMA.
-  Usa data-images per immagini statiche (copertina video),
-  oppure data-caption per una descrizione.
+  VIDEO: inserisci sempre il più recente IN CIMA.
+  Struttura: data-images="copertina.jpg,video.mp4"
+  La copertina appare in griglia; cliccando si apre la lightbox
+  con la copertina e poi il video riproducibile.
   ══════════════════════════════════════════════════════════════════
   -->
   <div class="insta-grid">
 
+    <!-- ★ PIÙ RECENTE — metti sempre qui sopra -->
+
     <div class="flash-wrap">
-      <div class="grid-item" 
-           data-images="copertina-video-001.jpg,REEL-tutto-d'un-fiato.mp4,flash-002.jpg" 
-           data-caption="SCRIVI QUI IL TUO TESTO — <a href='https://www.instagram.com/reel/DTC0hWdDACg/' target='_blank' style='color:var(--accent); text-decoration:underline;'>Guarda su Instagram</a>" 
+      <div class="grid-item"
+           data-images="copertina-video-001.jpg,REEL-tutto-d'un-fiato.mp4"
+           data-caption="Tutto d'un fiato 🖤"
            onclick="openLightbox(this)">
-        
-        <img src="copertina-video-001.jpg" alt="Video Reel" style="display: block !important;">
-    
-        <div class="grid-overlay">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-        </div>
-      </div>
-      
-      <div class="flash-meta">
-        <span class="available-label">Video Reel</span>
-      </div>
-    </div>
-
-    <div class="flash-wrap">
-      <a href="https://www.instagram.com/reel/DTC0hWdDACg/" target="_blank" class="grid-item">
-        
         <img src="copertina-video-001.jpg" alt="Video Reel">
-    
-        <div class="grid-overlay">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-        </div>
-      </a>
-      <div class="flash-meta">
-        <span class="available-label">Guarda su Instagram</span>
-      </div>
-    </div>
-
-    <div class="flash-wrap">
-      <div class="grid-item" 
-           data-images="REEL-tutto-d'un-fiato.mp4" 
-           data-caption="Video Reel — <a href='https://www.instagram.com/reel/DTC0hWdDACg/' target='_blank' style='color:var(--accent); text-decoration:underline;'>Guarda su Instagram</a>" 
-           onclick="openLightbox(this)">
-        
-        <img src="copertina-video-001.jpg" alt="Video Reel" style="display: block !important;">
-    
         <div class="grid-overlay">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <polygon points="5 3 19 12 5 21 5 3"/>
@@ -1134,72 +1088,7 @@
         </div>
       </div>
       <div class="flash-meta">
-        <span class="available-label">Video Reel</span>
-      </div>
-    </div>
-
-    <div class="flash-wrap">
-      <a href="REEL-tutto-d'un-fiato.mp4" target="_blank" class="grid-item">
-        
-        <img src="copertina-video-001.jpg" alt="Video Reel">
-    
-        <div class="grid-overlay">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-        </div>
-      </a>
-      <div class="flash-meta">
-        <span class="available-label">Guarda su Instagram</span>
-      </div>
-    </div>
-
-    <div class="flash-wrap">
-      <div class="grid-item" 
-           data-video="REEL-tutto-d'un-fiato.mp4" 
-           data-caption="Video Reel: Tutto d'un fiato" 
-           onclick="openLightbox(this)">
-        
-        <img src="copertina-video-001.jpg" alt="Video Reel">
-    
-        <div class="grid-overlay">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-        </div>
-      </div>
-      <div class="flash-meta">
-        <span class="available-label">Guarda il Reel</span>
-      </div>
-    </div>
-
-    <div class="grid-item" data-images="video4.jpg" onclick="openLightbox(this)">
-      <div class="grid-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Video 4
-      </div>
-      <div class="grid-overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      </div>
-    </div>
-
-    <div class="grid-item" data-images="video5.jpg" onclick="openLightbox(this)">
-      <div class="grid-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Video 5
-      </div>
-      <div class="grid-overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      </div>
-    </div>
-
-    <div class="grid-item" data-images="video6.jpg" onclick="openLightbox(this)">
-      <div class="grid-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Video 6
-      </div>
-      <div class="grid-overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span class="available-label">▶ Tutto d'un fiato</span>
       </div>
     </div>
 
@@ -1380,9 +1269,21 @@ function loadPost(el) {
     lbImages.forEach(src => {
       const slide = document.createElement('div');
       slide.className = 'lb-slide';
-      const img = document.createElement('img');
-      img.src = src;
-      slide.appendChild(img);
+      const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(src);
+      if (isVideo) {
+        const vid = document.createElement('video');
+        vid.src = src;
+        vid.controls = true;
+        vid.autoplay = true;
+        vid.playsInline = true;
+        vid.loop = true;
+        vid.style.cssText = 'max-width:100%;max-height:100%;outline:none;';
+        slide.appendChild(vid);
+      } else {
+        const img = document.createElement('img');
+        img.src = src;
+        slide.appendChild(img);
+      }
       sliderWrap.appendChild(slide);
     });
     sliderWrap.style.transform = 'translateX(0%)';
