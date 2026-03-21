@@ -1594,10 +1594,19 @@ document.getElementById('lightbox').addEventListener('touchmove', e => {
 }, { passive: false });
 
 document.getElementById('lb-main').addEventListener('touchend', e => {
-  /* Se il touch è partito sul video, non fare nulla:
-     il video gestisce da solo tap (pausa) e seek (barra) */
-  if (touchOnVideo) return;
-
+  /* Se il touch è partito sul video:
+     - swipe verticale → cambia post (ok)
+     - swipe orizzontale → ignorato (evita cambio slide accidentale)
+     - tap → il video gestisce da solo pausa/play */
+  if (touchOnVideo) {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    const threshold = 50;
+    if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > threshold) {
+      postStep(dy < 0 ? 1 : -1);
+    }
+    return;
+  }
   const dx = e.changedTouches[0].clientX - touchStartX;
   const dy = e.changedTouches[0].clientY - touchStartY;
   const threshold = 50;
