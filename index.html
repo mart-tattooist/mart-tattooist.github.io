@@ -1629,6 +1629,14 @@ document.addEventListener('keydown', e => {
 /* Blocca menu tasto destro su tutto il sito */
 document.addEventListener('contextmenu', e => e.preventDefault(), false);
 
+/* ── Blocca zoom da trackpad (Ctrl+Wheel) e da gesto (Safari/tablet) ── */
+document.addEventListener('wheel', e => {
+  if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
+document.addEventListener('gesturestart',  e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+document.addEventListener('gestureend',    e => e.preventDefault(), { passive: false });
+
 </script>
 </body>
 </html>
