@@ -1419,6 +1419,7 @@ function loadPost(el) {
         /* Mobile: touch drag fluido sulla barra */
         progBar.addEventListener('touchstart', e => { e.stopPropagation(); applySeek(e); }, { passive: false });
         progBar.addEventListener('touchmove',  e => { e.stopPropagation(); e.preventDefault(); applySeek(e); }, { passive: false });
+        progBar.addEventListener('touchend',   e => { e.stopPropagation(); }, { passive: false });
 
         /* Overlay play/pausa (copre solo la parte video, non la barra) */
         const overlay = document.createElement('div');
