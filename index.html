@@ -786,18 +786,20 @@
         height: auto;
       }
 
-      /* Immagine piccola: centrata nella slide */
+      /* Immagine nella slide — centrata orizzontalmente su mobile */
       .lb-slide {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
       .lb-slide img {
-        max-width: 100%;
-        max-height: 100%;
-        width: auto;
-        height: auto;
-        object-fit: contain;
+        width: auto !important;
+        height: auto !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: contain !important;
+        object-position: center center !important;
+        display: block !important;
       }
     }
   </style>
@@ -1229,7 +1231,7 @@
         </div>
       </div>
       <div class="flash-meta">
-        <span class="available-label">▶ Foglie morte</span>
+        <span class="available-label">▶ Prendono tutto</span>
       </div>
     </div>
 
