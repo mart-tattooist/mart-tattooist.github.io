@@ -1399,21 +1399,26 @@ function loadPost(el) {
         vid.addEventListener('pause', () => { cancelAnimationFrame(rafId); });
         vid.addEventListener('ended', () => { cancelAnimationFrame(rafId); progFill.style.width = '0%'; });
 
-        /* Seek: click e touch sulla barra */
-        function seekTo(e) {
-          e.stopPropagation();
+        /* Seek: click, drag e touch sulla barra */
+        function getSeekRatio(e) {
           const rect = progBar.getBoundingClientRect();
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-          if (vid.duration) vid.currentTime = ratio * vid.duration;
+          const clientX = (e.touches || e.changedTouches)
+            ? (e.touches[0] || e.changedTouches[0]).clientX
+            : e.clientX;
+          return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
         }
-        progBar.addEventListener('click', seekTo);
-        progBar.addEventListener('touchstart', seekTo, { passive: true });
-        /* Drag sulla barra */
+        function applySeek(e) {
+          e.stopPropagation();
+          if (vid.duration) vid.currentTime = getSeekRatio(e) * vid.duration;
+        }
+        /* Desktop: click + drag */
         let seeking = false;
-        progBar.addEventListener('mousedown', (e) => { seeking = true; seekTo(e); });
-        document.addEventListener('mousemove', (e) => { if (seeking) seekTo(e); });
+        progBar.addEventListener('mousedown', e => { seeking = true; applySeek(e); });
+        document.addEventListener('mousemove', e => { if (seeking) applySeek(e); });
         document.addEventListener('mouseup',   () => { seeking = false; });
+        /* Mobile: touch drag fluido sulla barra */
+        progBar.addEventListener('touchstart', e => { e.stopPropagation(); applySeek(e); }, { passive: false });
+        progBar.addEventListener('touchmove',  e => { e.stopPropagation(); e.preventDefault(); applySeek(e); }, { passive: false });
 
         /* Overlay play/pausa (copre solo la parte video, non la barra) */
         const overlay = document.createElement('div');
@@ -1571,10 +1576,13 @@ window.addEventListener('resize', setAppHeight);
 
 let touchStartX = 0;
 let touchStartY = 0;
+let touchOnVideo = false; /* flag: il touch è iniziato sul video */
 
 document.getElementById('lb-main').addEventListener('touchstart', e => {
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
+  /* Capisce se il dito è partito dall'area video (wrap o overlay) */
+  touchOnVideo = !!e.target.closest('.lb-video-wrap');
 }, { passive: false });
 
 /* Blocca pull-to-refresh e overscroll quando la lightbox è aperta */
@@ -1585,6 +1593,10 @@ document.getElementById('lightbox').addEventListener('touchmove', e => {
 }, { passive: false });
 
 document.getElementById('lb-main').addEventListener('touchend', e => {
+  /* Se il touch è partito sul video, non fare nulla:
+     il video gestisce da solo tap (pausa) e seek (barra) */
+  if (touchOnVideo) return;
+
   const dx = e.changedTouches[0].clientX - touchStartX;
   const dy = e.changedTouches[0].clientY - touchStartY;
   const threshold = 50;
