@@ -303,11 +303,11 @@
 
     /* Frecce INTERNE al post — solo chevron, nessun bollo */
     .lb-btn {
-      position: absolute; top: 50%; transform: translateY(-50%);
+      position: absolute; top: 0; bottom: 0;
       background: none;
       border: none;
       color: rgba(255,255,255,0.85);
-      width: 32px; height: 32px;
+      width: 52px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       font-size: 1.6rem;
@@ -318,8 +318,8 @@
       text-shadow: 0 1px 6px rgba(0,0,0,0.7);
     }
     .lb-btn:hover { color: #fff; }
-    .lb-prev { left: 0.5rem; }
-    .lb-next { right: 0.5rem; }
+    .lb-prev { left: 0; }
+    .lb-next { right: 0; }
 
     /* Dots — desktop: assoluti in basso sull'area immagine
        (lb-panel è position:relative; sidebar larga 260px è a destra) */
