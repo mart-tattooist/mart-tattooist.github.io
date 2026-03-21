@@ -216,38 +216,57 @@
     /* ── Wrapper video + barra progresso ── */
     .lb-video-wrap {
       position: relative;
-      display: inline-flex;
+      display: flex;
       flex-direction: column;
-      max-width: 100%;
-      max-height: 100%;
-      align-items: stretch;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
     }
     .lb-video-wrap video {
       display: block;
+      /* Si adatta all'altezza della finestra, non viene mai tagliato */
       max-width: 100%;
-      max-height: calc(100% - 2px);
+      max-height: calc(100% - 20px); /* 20px = area touch barra */
+      width: auto;
+      height: auto;
+      object-fit: contain;
       outline: none;
-      flex: 0 0 auto;
+      flex-shrink: 1;
     }
-    /* Barra progresso — sempre incollata sotto il video */
+    /* Barra progresso seekable — sempre incollata sotto il video */
     .lb-video-progress {
       width: 100%;
+      height: 20px; /* area touch grande */
+      flex: 0 0 20px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 0 4px;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .lb-video-progress-track {
+      width: 100%;
       height: 2px;
-      flex: 0 0 2px;
       background: rgba(255,255,255,0.18);
-      pointer-events: none;
+      border-radius: 1px;
+      position: relative;
+      overflow: hidden;
     }
     .lb-video-progress-fill {
       height: 100%;
       width: 0%;
       background: var(--accent);
       transition: none;
+      border-radius: 1px;
     }
+    .lb-video-progress:hover .lb-video-progress-track { height: 4px; }
     /* Overlay play/pausa — copre solo la parte video, non la barra */
     .lb-video-overlay {
       position: absolute;
       top: 0; left: 0; right: 0;
-      bottom: 2px;
+      bottom: 20px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       z-index: 5;
@@ -1126,8 +1145,10 @@
   <!--
   ══════════════════════════════════════════════════════════════════
   VIDEO: inserisci sempre il più recente IN CIMA.
-  Struttura: data-images="video.mp4"
-  La copertina in griglia è l'img src; cliccando il video parte in automatico.
+  Struttura consigliata:
+    data-images="video.mp4,immagine-dettaglio.jpg"
+  In griglia mostra la copertina (img src).
+  Nella lightbox: prima slide = video (autoplay), seconda = immagine.
   ══════════════════════════════════════════════════════════════════
   -->
   <div class="insta-grid">
@@ -1136,7 +1157,7 @@
 
     <div class="flash-wrap">
       <div class="grid-item"
-           data-images="REEL-tutto-d'un-fiato.mp4"
+           data-images="REEL-tutto-d'un-fiato.mp4,copertina-video-001.jpg"
            data-caption="Tutto d'un fiato 🖤"
            onclick="openLightbox(this)">
         <img src="copertina-video-001.jpg" alt="Video Reel">
@@ -1340,13 +1361,18 @@ function loadPost(el) {
         vid.loop = true;
         wrap.appendChild(vid);
 
-        /* Barra progresso — incollata subito sotto il video */
+        /* Barra progresso seekable — incollata subito sotto il video */
         const progBar = document.createElement('div');
         progBar.className = 'lb-video-progress';
+        const progTrack = document.createElement('div');
+        progTrack.className = 'lb-video-progress-track';
         const progFill = document.createElement('div');
         progFill.className = 'lb-video-progress-fill';
-        progBar.appendChild(progFill);
+        progTrack.appendChild(progFill);
+        progBar.appendChild(progTrack);
         wrap.appendChild(progBar);
+
+        /* Animazione barra */
         let rafId = null;
         function updateProgress() {
           if (vid.duration) progFill.style.width = (vid.currentTime / vid.duration * 100) + '%';
@@ -1355,6 +1381,22 @@ function loadPost(el) {
         vid.addEventListener('play',  () => { rafId = requestAnimationFrame(updateProgress); });
         vid.addEventListener('pause', () => { cancelAnimationFrame(rafId); });
         vid.addEventListener('ended', () => { cancelAnimationFrame(rafId); progFill.style.width = '0%'; });
+
+        /* Seek: click e touch sulla barra */
+        function seekTo(e) {
+          e.stopPropagation();
+          const rect = progBar.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+          if (vid.duration) vid.currentTime = ratio * vid.duration;
+        }
+        progBar.addEventListener('click', seekTo);
+        progBar.addEventListener('touchstart', seekTo, { passive: true });
+        /* Drag sulla barra */
+        let seeking = false;
+        progBar.addEventListener('mousedown', (e) => { seeking = true; seekTo(e); });
+        document.addEventListener('mousemove', (e) => { if (seeking) seekTo(e); });
+        document.addEventListener('mouseup',   () => { seeking = false; });
 
         /* Overlay play/pausa (copre solo la parte video, non la barra) */
         const overlay = document.createElement('div');
