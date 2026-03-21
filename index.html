@@ -213,13 +213,28 @@
       text-transform: uppercase; color: var(--muted); text-decoration: line-through;
     }
 
-    /* ── Barra progresso video (stile Reel) ── */
+    /* ── Wrapper video + barra progresso ── */
+    .lb-video-wrap {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      max-width: 100%;
+      max-height: 100%;
+      align-items: stretch;
+    }
+    .lb-video-wrap video {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100% - 2px);
+      outline: none;
+      flex: 0 0 auto;
+    }
+    /* Barra progresso — sempre incollata sotto il video */
     .lb-video-progress {
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 100%; height: 2px;
+      width: 100%;
+      height: 2px;
+      flex: 0 0 2px;
       background: rgba(255,255,255,0.18);
-      z-index: 6;
       pointer-events: none;
     }
     .lb-video-progress-fill {
@@ -227,6 +242,35 @@
       width: 0%;
       background: var(--accent);
       transition: none;
+    }
+    /* Overlay play/pausa — copre solo la parte video, non la barra */
+    .lb-video-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      bottom: 2px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .lb-play-btn {
+      width: 56px; height: 56px;
+      border: 1.5px solid rgba(255,255,255,0.75);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.22s, transform 0.22s;
+      pointer-events: none;
+    }
+    .lb-play-btn svg {
+      width: 20px; height: 20px;
+      fill: rgba(255,255,255,0.9);
+      margin-left: 3px;
+    }
+    .lb-video-overlay.hidden { opacity: 0; pointer-events: none; }
+    .lb-video-overlay:not(.hidden):hover .lb-play-btn {
+      transform: scale(1.1);
+      border-color: #fff;
     }
 
     /* ══════════════════════════════════════════
@@ -1081,58 +1125,21 @@
 
   <!--
   ══════════════════════════════════════════════════════════════════
-  VIDEO: stessa logica della pagina Flash ma senza etichette.
-  Inserisci sempre il più recente IN CIMA.
-  Usa data-images per immagini statiche (copertina video),
-  oppure data-caption per una descrizione.
+  VIDEO: inserisci sempre il più recente IN CIMA.
+  Struttura: data-images="video.mp4"
+  La copertina in griglia è l'img src; cliccando il video parte in automatico.
   ══════════════════════════════════════════════════════════════════
   -->
   <div class="insta-grid">
 
+    <!-- ★ PIÙ RECENTE — metti sempre qui sopra -->
+
     <div class="flash-wrap">
-      <div class="grid-item" 
-           data-images="copertina-video-001.jpg,REEL-tutto-d'un-fiato.mp4,flash-002.jpg" 
-           data-caption="SCRIVI QUI IL TUO TESTO — <a href='https://www.instagram.com/reel/DTC0hWdDACg/' target='_blank' style='color:var(--accent); text-decoration:underline;'>Guarda su Instagram</a>" 
+      <div class="grid-item"
+           data-images="REEL-tutto-d'un-fiato.mp4"
+           data-caption="Tutto d'un fiato 🖤"
            onclick="openLightbox(this)">
-        
-        <img src="copertina-video-001.jpg" alt="Video Reel" style="display: block !important;">
-    
-        <div class="grid-overlay">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-        </div>
-      </div>
-      
-      <div class="flash-meta">
-        <span class="available-label">Video Reel</span>
-      </div>
-    </div>
-
-    <div class="flash-wrap">
-      <a href="https://www.instagram.com/reel/DTC0hWdDACg/" target="_blank" class="grid-item">
-        
         <img src="copertina-video-001.jpg" alt="Video Reel">
-    
-        <div class="grid-overlay">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-        </div>
-      </a>
-      <div class="flash-meta">
-        <span class="available-label">Guarda su Instagram</span>
-      </div>
-    </div>
-
-    <div class="flash-wrap">
-      <div class="grid-item" 
-           data-images="REEL-tutto-d'un-fiato.mp4" 
-           data-caption="Video Reel — <a href='https://www.instagram.com/reel/DTC0hWdDACg/' target='_blank' style='color:var(--accent); text-decoration:underline;'>Guarda su Instagram</a>" 
-           onclick="openLightbox(this)">
-        
-        <img src="copertina-video-001.jpg" alt="Video Reel" style="display: block !important;">
-    
         <div class="grid-overlay">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <polygon points="5 3 19 12 5 21 5 3"/>
@@ -1140,72 +1147,7 @@
         </div>
       </div>
       <div class="flash-meta">
-        <span class="available-label">Video Reel</span>
-      </div>
-    </div>
-
-    <div class="flash-wrap">
-      <a href="REEL-tutto-d'un-fiato.mp4" target="_blank" class="grid-item">
-        
-        <img src="copertina-video-001.jpg" alt="Video Reel">
-    
-        <div class="grid-overlay">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-        </div>
-      </a>
-      <div class="flash-meta">
-        <span class="available-label">Guarda su Instagram</span>
-      </div>
-    </div>
-
-    <div class="flash-wrap">
-      <div class="grid-item" 
-           data-video="REEL-tutto-d'un-fiato.mp4" 
-           data-caption="Video Reel: Tutto d'un fiato" 
-           onclick="openLightbox(this)">
-        
-        <img src="copertina-video-001.jpg" alt="Video Reel">
-    
-        <div class="grid-overlay">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-        </div>
-      </div>
-      <div class="flash-meta">
-        <span class="available-label">Guarda il Reel</span>
-      </div>
-    </div>
-
-    <div class="grid-item" data-images="video4.jpg" onclick="openLightbox(this)">
-      <div class="grid-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Video 4
-      </div>
-      <div class="grid-overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      </div>
-    </div>
-
-    <div class="grid-item" data-images="video5.jpg" onclick="openLightbox(this)">
-      <div class="grid-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Video 5
-      </div>
-      <div class="grid-overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      </div>
-    </div>
-
-    <div class="grid-item" data-images="video6.jpg" onclick="openLightbox(this)">
-      <div class="grid-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Video 6
-      </div>
-      <div class="grid-overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span class="available-label">▶ Tutto d'un fiato</span>
       </div>
     </div>
 
@@ -1388,20 +1330,23 @@ function loadPost(el) {
       slide.className = 'lb-slide';
       const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(src);
       if (isVideo) {
+        /* Wrapper: video + barra in colonna */
+        const wrap = document.createElement('div');
+        wrap.className = 'lb-video-wrap';
+
         const vid = document.createElement('video');
         vid.src = src;
         vid.playsInline = true;
         vid.loop = true;
-        vid.style.cssText = 'max-width:100%;max-height:100%;outline:none;display:block;';
-        slide.appendChild(vid);
+        wrap.appendChild(vid);
 
-        /* Barra progresso */
+        /* Barra progresso — incollata subito sotto il video */
         const progBar = document.createElement('div');
         progBar.className = 'lb-video-progress';
         const progFill = document.createElement('div');
         progFill.className = 'lb-video-progress-fill';
         progBar.appendChild(progFill);
-        slide.appendChild(progBar);
+        wrap.appendChild(progBar);
         let rafId = null;
         function updateProgress() {
           if (vid.duration) progFill.style.width = (vid.currentTime / vid.duration * 100) + '%';
@@ -1411,9 +1356,9 @@ function loadPost(el) {
         vid.addEventListener('pause', () => { cancelAnimationFrame(rafId); });
         vid.addEventListener('ended', () => { cancelAnimationFrame(rafId); progFill.style.width = '0%'; });
 
-        /* Overlay play/pausa */
+        /* Overlay play/pausa (copre solo la parte video, non la barra) */
         const overlay = document.createElement('div');
-        overlay.className = 'lb-video-overlay';
+        overlay.className = 'lb-video-overlay hidden'; /* parte nascosto: autoplay */
         overlay.innerHTML = '<div class="lb-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>';
         function togglePlay(e) {
           e.stopPropagation();
@@ -1423,7 +1368,9 @@ function loadPost(el) {
         overlay.addEventListener('click', togglePlay);
         vid.addEventListener('click', togglePlay);
         vid.addEventListener('ended', () => overlay.classList.remove('hidden'));
-        slide.appendChild(overlay);
+        wrap.appendChild(overlay);
+
+        slide.appendChild(wrap);
 
       } else {
         const img = document.createElement('img');
@@ -1477,14 +1424,25 @@ function lbShow() {
   const sliderWrap = document.getElementById('lb-slider-wrap');
   if (!sliderWrap) return;
 
-  /* Pausa tutti i video e mostra di nuovo il play overlay */
+  /* Pausa tutti i video e mostra il play overlay */
   sliderWrap.querySelectorAll('video').forEach(v => {
     v.pause();
-    const overlay = v.closest('.lb-slide').querySelector('.lb-video-overlay');
+    const overlay = v.closest('.lb-video-wrap') && v.closest('.lb-video-wrap').querySelector('.lb-video-overlay');
     if (overlay) overlay.classList.remove('hidden');
   });
 
   sliderWrap.style.transform = `translateX(-${lbCurrent * 100}%)`;
+
+  /* Autoplay sul video della slide corrente */
+  const currentSlide = sliderWrap.querySelectorAll('.lb-slide')[lbCurrent];
+  if (currentSlide) {
+    const vid = currentSlide.querySelector('video');
+    if (vid) {
+      vid.play().catch(() => {});
+      const overlay = currentSlide.querySelector('.lb-video-overlay');
+      if (overlay) overlay.classList.add('hidden');
+    }
+  }
 
   const showArrows = lbImages.length > 1;
   const prevBtn = document.querySelector('.lb-prev');
