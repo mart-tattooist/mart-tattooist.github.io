@@ -359,9 +359,12 @@
       cursor: pointer; /* Fa capire che qui si può cliccare per uscire */
     }
     .lb-slide img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain; /* Mantiene la foto intera senza tagliarla o rimpicciolirla troppo */
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
     }
 
     /* Frecce INTERNE al post — solo chevron, nessun bollo */
@@ -786,21 +789,7 @@
         height: auto;
       }
 
-      /* Immagine nella slide — centrata orizzontalmente su mobile */
-      .lb-slide {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-      }
-      .lb-slide img {
-        width: auto !important;
-        height: auto !important;
-        max-width: 100% !important;
-        max-height: 100% !important;
-        object-fit: contain !important;
-        object-position: center center !important;
-        display: block !important;
-      }
+
     }
   </style>
 </head>
@@ -1434,11 +1423,7 @@ function loadPost(el) {
       } else {
         const img = document.createElement('img');
         img.src = src;
-        /* Su mobile: inline style diretto per centrare senza tagli */
-        if (window.innerWidth <= 680) {
-          slide.style.cssText = 'display:flex;align-items:center;justify-content:center;';
-          img.style.cssText = 'width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;display:block;';
-        }
+
         slide.appendChild(img);
       }
       sliderWrap.appendChild(slide);
