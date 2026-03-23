@@ -498,7 +498,7 @@
       .lb-panel {
         flex-direction: column;
         width: 100vw;
-        height: var(--app-height) − 64px − 36px − 120px;
+        height: var(--app-height);
         border-radius: 0;
         background: #000;
         overflow: hidden;
@@ -786,9 +786,10 @@
         height: auto;
       }
 
-      /* Immagine nella slide — centrata orizzontalmente su mobile */
+      /* Immagine nella slide — centrata orizzontalmente e verticalmente su mobile */
       .lb-slide {
         display: flex !important;
+        height: 100% !important;
         align-items: center !important;
         justify-content: center !important;
       }
