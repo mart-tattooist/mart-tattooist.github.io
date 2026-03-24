@@ -499,60 +499,53 @@
     ══════════════════════════════════════════ */
     @media (max-width: 680px) {
 
-      /* Blocca overscroll/pull-to-refresh sul pannello */
-      .lightbox {
-        overflow: hidden;
-        overscroll-behavior: none;
-      }
-
-      /* Il pannello occupa ESATTAMENTE lo schermo visibile */
+      @media (max-width: 680px) {
+      /* 1. Cambiamo il contenitore principale per non forzare l'altezza piena */
       .lb-panel {
         flex-direction: column;
         width: 100vw;
-        height: var(--app-height);
+      /* Rimuoviamo o cambiamo l'altezza fissa per permettere al contenuto di stare in alto */
+        height: auto !important; 
+        max-height: 90vh; 
         border-radius: 0;
         background: #000;
-        overflow: hidden;
-        justify-content: flex-start;
+        overflow-y: auto; /* Permette lo scroll se il testo è lungo */
+        justify-content: flex-start !important; /* Spinge tutto verso l'alto */
         align-items: stretch;
+        margin-top: 20px; /* Opzionale: un piccolo margine dal bordo superiore del telefono */
       }
 
-      /* Immagine: altezza fissa, i dots e la descrizione la seguono subito sotto */
+      /* 2. L'immagine non deve più "spingere" verso il basso */
       .lb-img-col {
-        flex: 0 0 auto;
-        height: 62vh;
+        flex: 0 0 auto !important; /* Non si espande più per riempire il vuoto */
         width: 100%;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        position: relative;
+        min-height: 0;
+        display: block; 
         background: #000;
-        touch-action: none;
       }
 
-      /* DOTS — solo la loro altezza naturale */
+      .lb-slide {
+        display: block !important;
+        height: auto !important;
+        text-align: center;
+      }
+
+      .lb-slide img, .lb-slide video {
+        max-height: 60vh !important; /* Limita l'altezza dell'immagine per far stare tutto in alto */
+        width: auto;
+        margin: 0 auto;
+      }
+
+      /* 3. I pallini e la sidebar seguiranno naturalmente l'immagine */
       .lb-dots {
-        position: static;
-        transform: none;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        flex: 0 0 auto;
-        width: 100%;
-        padding: 7px 0;
-        background: #000;
-        z-index: auto;
+        padding: 1rem 0;
+        position: relative;
+        bottom: 0;
       }
 
-      /* Sidebar: descrizione appena sotto i dots */
       .lb-sidebar {
-        flex: 0 0 auto;
-        width: 100%;
-        padding: 0.7rem 1.2rem 1rem;
-        background: var(--bg);
-        border-top: 1px solid rgba(255,255,255,0.06);
+        flex: 0 0 auto !important;
+        padding: 0 1.5rem 2rem; /* Spazio sotto il testo */
       }
 
       .lb-caption-wrapper {
