@@ -784,14 +784,15 @@
       .lb-slide {
         display: flex !important;
         height: 100% !important;
-        align-items: center !important;
+        align-items: flex-end !important;
         justify-content: center !important;
       }
       .lb-slide img {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
-        object-position: center center !important;
+        width: auto !important;
+        height: auto !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: contain !important;
         display: block !important;
       }
     }
