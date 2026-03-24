@@ -503,7 +503,7 @@
         align-items: stretch;
       }
 
-      /* Immagine: occupa tutto lo spazio libero sopra dots + descrizione */
+      /* Immagine: occupa tutto lo spazio sopra dots + descrizione */
       .lb-img-col {
         flex: 1 1 0;
         min-height: 0;
@@ -516,7 +516,7 @@
         touch-action: none;
       }
 
-      /* DOTS — striscia minima tra foto e descrizione */
+      /* DOTS — solo la loro altezza naturale */
       .lb-dots {
         position: static;
         transform: none;
@@ -532,7 +532,7 @@
         z-index: auto;
       }
 
-      /* Sidebar: descrizione incollata sotto i dots */
+      /* Sidebar: descrizione appena sotto i dots */
       .lb-sidebar {
         flex: 0 0 auto;
         width: 100%;
@@ -788,11 +788,9 @@
         justify-content: center !important;
       }
       .lb-slide img {
-        width: auto !important;
-        height: auto !important;
-        max-width: 100% !important;
-        max-height: 100% !important;
-        object-fit: contain !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
         object-position: center center !important;
         display: block !important;
       }
