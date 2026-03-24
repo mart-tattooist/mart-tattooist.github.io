@@ -429,6 +429,20 @@
       color: rgba(255,255,255,0.4); font-size: 1.6rem;
       cursor: pointer; transition: color 0.2s; z-index: 10; line-height: 1;
     }
+    @media (max-width: 680px) {
+      .lb-close {
+        position: fixed;
+        top: 14px;
+        right: 16px;
+        z-index: 9999;
+        font-size: 2rem;
+        color: rgba(255,255,255,0.7);
+        background: rgba(0,0,0,0.45);
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+      }
+    }
     .lb-close:hover { color: #fff; }
 
     .lb-caption {
@@ -509,7 +523,7 @@
         height: 62vh;
         width: 100%;
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: center;
         position: relative;
         background: #000;
@@ -527,7 +541,7 @@
         gap: 8px;
         flex: 0 0 auto;
         width: 100%;
-        padding: 2px 0;
+        padding: 7px 0;
         background: #000;
         z-index: auto;
       }
@@ -536,7 +550,7 @@
       .lb-sidebar {
         flex: 0 0 auto;
         width: 100%;
-        padding: 4px 1.2rem 0.8rem;
+        padding: 0.7rem 1.2rem 1rem;
         background: var(--bg);
         border-top: 1px solid rgba(255,255,255,0.06);
       }
