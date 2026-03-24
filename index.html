@@ -499,16 +499,15 @@
         border-radius: 0;
         background: #000;
         overflow: hidden;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: stretch;
       }
 
-      /* Immagine: dimensione fissa, centrata — non espande */
+      /* Immagine: occupa tutto lo spazio libero sopra dots + descrizione */
       .lb-img-col {
-        flex: 0 0 auto;
-        width: 100%;
-        height: min(100vw, calc(var(--app-height) - 7.5rem));
+        flex: 1 1 0;
         min-height: 0;
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -517,7 +516,7 @@
         touch-action: none;
       }
 
-      /* DOTS — solo la loro altezza naturale */
+      /* DOTS — striscia minima tra foto e descrizione */
       .lb-dots {
         position: static;
         transform: none;
@@ -533,7 +532,7 @@
         z-index: auto;
       }
 
-      /* Sidebar: descrizione appena sotto i dots */
+      /* Sidebar: descrizione incollata sotto i dots */
       .lb-sidebar {
         flex: 0 0 auto;
         width: 100%;
