@@ -6,6 +6,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
   <style>
+    /* Nasconde la splash istantaneamente se non è la prima visita */
+    #splash { display: flex; }
+  </style>
+  <script>
+    if (sessionStorage.getItem('mart_visited')) {
+      document.write('<style>#splash{display:none!important}</style>');
+    }
+  </script>
+  <style>
 
     :root {
       --bg:       #0f0f0f;
@@ -821,8 +830,8 @@
       pointer-events: none;
     }
     #splash img {
-      max-width: 160px;
-      width: 40vw;
+      max-width: 260px;
+      width: 55vw;
       height: auto;
       display: block;
       pointer-events: none;
@@ -2297,7 +2306,10 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
 /* ──────── SPLASH SCREEN ──────── */
 (function () {
   var splash = document.getElementById('splash');
-  if (!splash) return;
+  if (!splash || splash.style.display === 'none') return;
+
+  /* Segna la visita così i ricaricamenti saltano la splash */
+  sessionStorage.setItem('mart_visited', '1');
 
   function hideSplash() {
     splash.classList.add('hidden');
@@ -2311,7 +2323,7 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
   } else {
     var minShown = false;
     var pageReady = false;
-    var minTimer = setTimeout(function () {
+    setTimeout(function () {
       minShown = true;
       if (pageReady) hideSplash();
     }, 800);
