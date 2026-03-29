@@ -804,11 +804,58 @@
         display: block !important;
       }
     }
+    /* ──────── SPLASH SCREEN ──────── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #0f0f0f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.7s ease;
+      pointer-events: all;
+    }
+    #splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #splash img {
+      max-width: 160px;
+      width: 40vw;
+      height: auto;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      opacity: 0;
+      transform: scale(0.94);
+      animation: splashLogoIn 0.6s ease 0.1s forwards;
+    }
+    #splash .splash-fallback {
+      font-family: var(--font);
+      font-size: 2rem;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      color: var(--text);
+      opacity: 0;
+      animation: splashLogoIn 0.6s ease 0.1s forwards;
+    }
+    @keyframes splashLogoIn {
+      to { opacity: 1; transform: scale(1); }
+    }
   </style>
 </head>
 <body>
 
-<!-- ═══════════ NAVBAR ═══════════ -->
+<!-- ═══════════ SPLASH SCREEN ═══════════ -->
+<div id="splash">
+  <img src="logo.png" alt="MART"
+       onerror="this.style.display='none'; document.getElementById('splash-fallback').style.display='block'">
+  <span id="splash-fallback" class="splash-fallback" style="display:none">MART</span>
+</div>
+
+
 <nav>
   <div class="nav-logo" onclick="showPage('lavori')">
     <img src="logo.png" alt="Logo" onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block'">
@@ -2247,7 +2294,36 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
 
 })(); /* fine easter egg */
 
-/* ── Blocca zoom da trackpad (Ctrl+Wheel) e da gesto (Safari/tablet) ── */
+/* ──────── SPLASH SCREEN ──────── */
+(function () {
+  var splash = document.getElementById('splash');
+  if (!splash) return;
+
+  function hideSplash() {
+    splash.classList.add('hidden');
+    setTimeout(function () { splash.remove(); }, 750);
+  }
+
+  /* Si dissolve quando tutto (immagini incluse) è pronto */
+  if (document.readyState === 'complete') {
+    /* Minimo 800ms così non è un lampo se la pagina è già in cache */
+    setTimeout(hideSplash, 800);
+  } else {
+    var minShown = false;
+    var pageReady = false;
+    var minTimer = setTimeout(function () {
+      minShown = true;
+      if (pageReady) hideSplash();
+    }, 800);
+
+    window.addEventListener('load', function () {
+      pageReady = true;
+      if (minShown) hideSplash();
+    });
+  }
+})();
+
+
 document.addEventListener('wheel', e => {
   if (e.ctrlKey) e.preventDefault();
 }, { passive: false });
