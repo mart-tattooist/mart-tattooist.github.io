@@ -301,6 +301,42 @@
       border-color: #fff;
     }
 
+    /* ── Pulsante muto ── */
+    .lb-mute-btn {
+      position: absolute;
+      bottom: 28px;   /* sopra la barra da 20px */
+      right: 12px;
+      z-index: 400;   /* sopra lb-post-btn che è 300 */
+      background: rgba(0,0,0,0.42);
+      border: none;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .lb-mute-btn:hover { background: rgba(0,0,0,0.65); }
+    .lb-mute-btn svg {
+      width: 15px; height: 15px;
+      fill: none;
+      stroke: rgba(255,255,255,0.92);
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+    }
+
+    /* Nasconde Cast/AirPlay iniettato dal browser */
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-enclosure,
+    video::-webkit-media-controls-panel,
+    video::-webkit-media-presentation-button,
+    video::-webkit-media-controls-wireless-playback-picker-button,
+    video::-internal-media-controls-overflow-button { display: none !important; }
+
     /* Pulsante muto — in basso a destra, sopra la barra progresso */
     .lb-mute-btn {
       position: absolute;
@@ -1552,12 +1588,29 @@ function loadPost(el) {
         const svgOn  = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
         const svgOff = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
         muteBtn.innerHTML = svgOn;
-        muteBtn.addEventListener('click', e => {
+
+        function toggleMute(e) {
           e.stopPropagation();
           e.preventDefault();
           vid.muted = !vid.muted;
           muteBtn.innerHTML = vid.muted ? svgOff : svgOn;
-        });
+        }
+
+        /* Desktop: click */
+        muteBtn.addEventListener('click', toggleMute);
+
+        /* Mobile: touchend diretto sul pulsante —
+           bypassa il preventDefault del touchmove della lightbox
+           che altrimenti blocca il click sintetico */
+        muteBtn.addEventListener('touchstart', e => {
+          e.stopPropagation();
+        }, { passive: true });
+        muteBtn.addEventListener('touchend', e => {
+          e.stopPropagation();
+          e.preventDefault();
+          toggleMute(e);
+        }, { passive: false });
+
         wrap.appendChild(muteBtn);
 
         slide.appendChild(wrap);
