@@ -271,52 +271,71 @@
       border-radius: 1px;
     }
     .lb-video-progress:hover .lb-video-progress-track { height: 4px; }
-    /* Overlay play/pausa — icona piccola in alto a sinistra */
+    /* Overlay play/pausa — copre solo la parte video, non la barra */
     .lb-video-overlay {
       position: absolute;
-      top: 12px; left: 12px;
+      top: 0; left: 0; right: 0;
+      bottom: 20px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       z-index: 5;
-      transition: opacity 0.5s ease;
     }
     .lb-play-btn {
-      width: 28px; height: 28px;
+      width: 56px; height: 56px;
+      border: 1.5px solid rgba(255,255,255,0.75);
+      border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.22s, transform 0.22s;
       pointer-events: none;
-      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7));
     }
     .lb-play-btn svg {
-      width: 18px; height: 18px;
+      width: 20px; height: 20px;
       fill: rgba(255,255,255,0.9);
+      margin-left: 3px;
     }
     .lb-video-overlay.hidden { opacity: 0; pointer-events: none; }
+    .lb-video-overlay:not(.hidden):hover .lb-play-btn {
+      transform: scale(1.1);
+      border-color: #fff;
+    }
 
-    /* Pulsante muto — in basso a destra */
+    /* Pulsante muto — in basso a destra, sopra la barra progresso */
     .lb-mute-btn {
       position: absolute;
-      bottom: 30px; right: 12px;
+      bottom: 28px; /* 20px barra + 8px spazio */
+      right: 12px;
       z-index: 10;
-      background: rgba(0,0,0,0.38);
+      background: rgba(0,0,0,0.42);
       border: none;
       border-radius: 50%;
-      width: 34px; height: 34px;
+      width: 32px; height: 32px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      backdrop-filter: blur(4px);
-      transition: background 0.2s, opacity 0.2s;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      transition: background 0.2s;
       padding: 0;
     }
-    .lb-mute-btn:hover { background: rgba(0,0,0,0.58); }
+    .lb-mute-btn:hover { background: rgba(0,0,0,0.62); }
     .lb-mute-btn svg {
-      width: 16px; height: 16px;
+      width: 15px; height: 15px;
       fill: none;
-      stroke: rgba(255,255,255,0.9);
+      stroke: rgba(255,255,255,0.92);
       stroke-width: 1.8;
       stroke-linecap: round;
       stroke-linejoin: round;
       pointer-events: none;
     }
+
+    /* Nasconde il pulsante Cast / AirPlay iniettato dal browser */
+    video::-webkit-media-controls { display: none !important; }
+    video::-webkit-media-controls-enclosure { display: none !important; }
+    video::-webkit-media-controls-panel { display: none !important; }
+    video::-webkit-media-presentation-button { display: none !important; }
+    video::-webkit-media-controls-wireless-playback-picker-button { display: none !important; }
+    video::-internal-media-controls-overflow-button { display: none !important; }
 
     /* ══════════════════════════════════════════
        LIGHTBOX con immagine grande + thumbnails
@@ -1327,7 +1346,7 @@
       </div>
 
       <!-- ★ MODIFICA: inserisci qui il tuo nome e cognome vero -->
-      <p class="artist-real-name">Martino Parizzi</p>
+      <p class="artist-real-name"><i>Disegno su fogli, muri e persone</i></p>
 
       <p>
         Disegno da sempre: ho iniziato con i graffiti e mi sono formato nella grafica.
@@ -1466,6 +1485,7 @@ function loadPost(el) {
         vid.src = src;
         vid.playsInline = true;
         vid.loop = true;
+        vid.disableRemotePlayback = true; /* nasconde Cast/AirPlay */
         wrap.appendChild(vid);
 
         /* Barra progresso seekable — incollata subito sotto il video */
@@ -1511,53 +1531,30 @@ function loadPost(el) {
         progBar.addEventListener('touchmove',  e => { e.stopPropagation(); e.preventDefault(); applySeek(e); }, { passive: false });
         progBar.addEventListener('touchend',   e => { e.stopPropagation(); }, { passive: false });
 
-        /* Overlay play/pausa — icona piccola in alto a sinistra */
+        /* Overlay play/pausa (copre solo la parte video, non la barra) */
         const overlay = document.createElement('div');
-        overlay.className = 'lb-video-overlay hidden';
+        overlay.className = 'lb-video-overlay hidden'; /* parte nascosto: autoplay */
         overlay.innerHTML = '<div class="lb-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>';
-
-        let hideOverlayTimer = null;
-        function scheduleHide() {
-          clearTimeout(hideOverlayTimer);
-          hideOverlayTimer = setTimeout(() => overlay.classList.add('hidden'), 3500);
-        }
-
         function togglePlay(e) {
           e.stopPropagation();
-          if (vid.paused) {
-            vid.play();
-            /* Mostra brevemente l'icona poi nasconde */
-            overlay.classList.remove('hidden');
-            scheduleHide();
-          } else {
-            vid.pause();
-            clearTimeout(hideOverlayTimer);
-            /* Sull'icona pause: mostra il play fisso finché non si riprende */
-            overlay.querySelector('.lb-play-btn svg').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
-            overlay.classList.remove('hidden');
-          }
+          if (vid.paused) { vid.play(); overlay.classList.add('hidden'); }
+          else            { vid.pause(); overlay.classList.remove('hidden'); }
         }
         overlay.addEventListener('click', togglePlay);
         vid.addEventListener('click', togglePlay);
-        vid.addEventListener('ended', () => {
-          clearTimeout(hideOverlayTimer);
-          overlay.classList.remove('hidden');
-        });
+        vid.addEventListener('ended', () => overlay.classList.remove('hidden'));
         wrap.appendChild(overlay);
 
-        /* Pulsante muto — in basso a destra */
+        /* Pulsante muto — in basso a destra sopra la barra progresso */
         const muteBtn = document.createElement('button');
         muteBtn.className = 'lb-mute-btn';
-        muteBtn.setAttribute('aria-label', 'Muto');
-
-        const iconOn  = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
-        const iconOff = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
-
-        muteBtn.innerHTML = iconOn;
+        const svgOn  = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+        const svgOff = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15" stroke="rgba(255,255,255,0.92)" stroke-width="1.8" stroke-linecap="round"/><line x1="17" y1="9" x2="23" y2="15" stroke="rgba(255,255,255,0.92)" stroke-width="1.8" stroke-linecap="round"/></svg>';
+        muteBtn.innerHTML = svgOn;
         muteBtn.addEventListener('click', e => {
           e.stopPropagation();
           vid.muted = !vid.muted;
-          muteBtn.innerHTML = vid.muted ? iconOff : iconOn;
+          muteBtn.innerHTML = vid.muted ? svgOff : svgOn;
         });
         wrap.appendChild(muteBtn);
 
@@ -1631,12 +1628,7 @@ function lbShow() {
     if (vid) {
       vid.play().catch(() => {});
       const overlay = currentSlide.querySelector('.lb-video-overlay');
-      if (overlay) {
-        /* Mostra brevemente poi nasconde dopo 3.5s */
-        overlay.classList.remove('hidden');
-        clearTimeout(overlay._hideTimer);
-        overlay._hideTimer = setTimeout(() => overlay.classList.add('hidden'), 3500);
-      }
+      if (overlay) overlay.classList.add('hidden');
     }
   }
 
