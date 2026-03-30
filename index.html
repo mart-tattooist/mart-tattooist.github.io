@@ -304,9 +304,9 @@
     /* Pulsante muto — in basso a destra, sopra la barra progresso */
     .lb-mute-btn {
       position: absolute;
-      bottom: 28px; /* 20px barra + 8px spazio */
+      bottom: 28px; /* 20px barra + 8px margine */
       right: 12px;
-      z-index: 10;
+      z-index: 400; /* sopra lb-post-btn che è a 300 */
       background: rgba(0,0,0,0.42);
       border: none;
       border-radius: 50%;
@@ -317,8 +317,9 @@
       -webkit-backdrop-filter: blur(6px);
       transition: background 0.2s;
       padding: 0;
+      pointer-events: all; /* garantisce che riceva i click */
     }
-    .lb-mute-btn:hover { background: rgba(0,0,0,0.62); }
+    .lb-mute-btn:hover { background: rgba(0,0,0,0.65); }
     .lb-mute-btn svg {
       width: 15px; height: 15px;
       fill: none;
@@ -329,12 +330,12 @@
       pointer-events: none;
     }
 
-    /* Nasconde il pulsante Cast / AirPlay iniettato dal browser */
-    video::-webkit-media-controls { display: none !important; }
-    video::-webkit-media-controls-enclosure { display: none !important; }
-    video::-webkit-media-controls-panel { display: none !important; }
-    video::-webkit-media-presentation-button { display: none !important; }
-    video::-webkit-media-controls-wireless-playback-picker-button { display: none !important; }
+    /* Nasconde Cast / AirPlay iniettato dal browser */
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-enclosure,
+    video::-webkit-media-controls-panel,
+    video::-webkit-media-presentation-button,
+    video::-webkit-media-controls-wireless-playback-picker-button,
     video::-internal-media-controls-overflow-button { display: none !important; }
 
     /* ══════════════════════════════════════════
@@ -1346,7 +1347,7 @@
       </div>
 
       <!-- ★ MODIFICA: inserisci qui il tuo nome e cognome vero -->
-      <p class="artist-real-name"><i>Disegno su fogli, muri e persone</i></p>
+      <p class="artist-real-name">Martino Parizzi</p>
 
       <p>
         Disegno da sempre: ho iniziato con i graffiti e mi sono formato nella grafica.
@@ -1485,7 +1486,7 @@ function loadPost(el) {
         vid.src = src;
         vid.playsInline = true;
         vid.loop = true;
-        vid.disableRemotePlayback = true; /* nasconde Cast/AirPlay */
+        vid.disableRemotePlayback = true;
         wrap.appendChild(vid);
 
         /* Barra progresso seekable — incollata subito sotto il video */
@@ -1545,14 +1546,15 @@ function loadPost(el) {
         vid.addEventListener('ended', () => overlay.classList.remove('hidden'));
         wrap.appendChild(overlay);
 
-        /* Pulsante muto — in basso a destra sopra la barra progresso */
+        /* Pulsante muto — in basso a destra, z-index 400 sopra tutto */
         const muteBtn = document.createElement('button');
         muteBtn.className = 'lb-mute-btn';
         const svgOn  = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
-        const svgOff = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15" stroke="rgba(255,255,255,0.92)" stroke-width="1.8" stroke-linecap="round"/><line x1="17" y1="9" x2="23" y2="15" stroke="rgba(255,255,255,0.92)" stroke-width="1.8" stroke-linecap="round"/></svg>';
+        const svgOff = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
         muteBtn.innerHTML = svgOn;
         muteBtn.addEventListener('click', e => {
           e.stopPropagation();
+          e.preventDefault();
           vid.muted = !vid.muted;
           muteBtn.innerHTML = vid.muted ? svgOff : svgOn;
         });
