@@ -2308,30 +2308,48 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
   var splash = document.getElementById('splash');
   if (!splash || splash.style.display === 'none') return;
 
-  /* Segna la visita così i ricaricamenti saltano la splash */
   sessionStorage.setItem('mart_visited', '1');
 
+  var MIN_MS = 1000; /* minimo 1 secondo visibile */
+  var startTime = Date.now();
+
   function hideSplash() {
-    splash.classList.add('hidden');
-    setTimeout(function () { splash.remove(); }, 750);
+    var elapsed = Date.now() - startTime;
+    var delay = Math.max(0, MIN_MS - elapsed);
+    setTimeout(function () {
+      splash.classList.add('hidden');
+      setTimeout(function () { splash.remove(); }, 750);
+    }, delay);
   }
 
-  /* Si dissolve quando tutto (immagini incluse) è pronto */
-  if (document.readyState === 'complete') {
-    /* Minimo 800ms così non è un lampo se la pagina è già in cache */
-    setTimeout(hideSplash, 800);
-  } else {
-    var minShown = false;
-    var pageReady = false;
-    setTimeout(function () {
-      minShown = true;
-      if (pageReady) hideSplash();
-    }, 800);
+  function waitForImages() {
+    /* Prende tutte le <img> della pagina eccetto quella del logo nella splash */
+    var imgs = Array.prototype.slice.call(document.querySelectorAll('img:not(#splash img)'));
+    if (imgs.length === 0) { hideSplash(); return; }
 
-    window.addEventListener('load', function () {
-      pageReady = true;
-      if (minShown) hideSplash();
+    var total = imgs.length;
+    var done = 0;
+
+    function onSettled() {
+      done++;
+      if (done >= total) hideSplash();
+    }
+
+    imgs.forEach(function (img) {
+      if (img.complete) {
+        onSettled();
+      } else {
+        img.addEventListener('load',  onSettled, { once: true });
+        img.addEventListener('error', onSettled, { once: true });
+      }
     });
+  }
+
+  /* Aspetta prima che il DOM sia pronto, poi traccia le immagini */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', waitForImages);
+  } else {
+    waitForImages();
   }
 })();
 
