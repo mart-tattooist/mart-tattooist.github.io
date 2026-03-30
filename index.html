@@ -301,17 +301,17 @@
       border-color: #fff;
     }
 
-    /* Pulsante muto — fixed, indipendente da lb-main e dai suoi handler */
+    /* Pulsante muto — fixed, posizionato via JS sopra il video attivo */
     #lb-mute-btn {
       position: fixed;
-      bottom: 52px;  /* sopra la barra progresso di 20px + margine */
-      right: 20px;
-      z-index: 99998; /* sotto la splash (99999) ma sopra tutto il resto */
+      z-index: 99998;
       background: rgba(0,0,0,0.42);
       border: none;
       border-radius: 50%;
       width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
+      display: none;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
@@ -1701,9 +1701,21 @@ const SVG_OFF = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 1
 const lbMuteBtn = document.getElementById('lb-mute-btn');
 lbMuteBtn.innerHTML = SVG_ON;
 
+function positionMuteBtn() {
+  /* Posiziona il pulsante in basso a destra del pannello video (lb-main),
+     sopra la barra progresso da 20px */
+  const lbMain = document.getElementById('lb-main');
+  if (!lbMain) return;
+  const r = lbMain.getBoundingClientRect();
+  lbMuteBtn.style.bottom = (window.innerHeight - r.bottom + 28) + 'px'; /* 20px barra + 8px margine */
+  lbMuteBtn.style.right  = (window.innerWidth  - r.right  + 12) + 'px';
+}
+
 function updateMuteBtn() {
-  const vid = document.querySelector('#lb-slider-wrap .lb-slide video');
+  const currentSlide = document.querySelectorAll('#lb-slider-wrap .lb-slide')[lbCurrent];
+  const vid = currentSlide && currentSlide.querySelector('video');
   if (vid) {
+    positionMuteBtn();
     lbMuteBtn.style.display = 'flex';
     lbMuteBtn.innerHTML = vid.muted ? SVG_OFF : SVG_ON;
   } else {
@@ -1712,10 +1724,15 @@ function updateMuteBtn() {
 }
 
 lbMuteBtn.addEventListener('click', () => {
-  const vid = document.querySelector('#lb-slider-wrap .lb-slide video');
+  const currentSlide = document.querySelectorAll('#lb-slider-wrap .lb-slide')[lbCurrent];
+  const vid = currentSlide && currentSlide.querySelector('video');
   if (!vid) return;
   vid.muted = !vid.muted;
   lbMuteBtn.innerHTML = vid.muted ? SVG_OFF : SVG_ON;
+});
+
+window.addEventListener('resize', () => {
+  if (lbMuteBtn.style.display !== 'none') positionMuteBtn();
 });
 
 /* ── 4. EVENTI ── */
