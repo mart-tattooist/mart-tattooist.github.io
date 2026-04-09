@@ -1902,17 +1902,29 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
     mainCtx = canvas.getContext('2d');
 
     /* ── carica immagine stencil reale ── */
+    /* helper: calcola srcX,srcY,srcW,srcH per un cover-crop */
+    function coverCrop (iw, ih, dw, dh) {
+      const ia = iw / ih, da = dw / dh;
+      let sx, sy, sw, sh;
+      if (ia > da) { sh = ih; sw = ih * da; sx = (iw - sw) / 2; sy = 0; }
+      else         { sw = iw; sh = iw / da; sx = 0; sy = (ih - sh) / 2; }
+      return { sx, sy, sw, sh };
+    }
+
     const stencilImg = new Image();
     stencilImg.onload = function () {
-      /* disegna l'immagine sul canvas principale */
-      mainCtx.drawImage(stencilImg, 0, 0, canvasW, canvasH);
+      const { sx, sy, sw, sh } = coverCrop(
+        stencilImg.naturalWidth, stencilImg.naturalHeight, canvasW, canvasH);
 
-      /* analizza pixel su canvas ghost per trovare le linee viola */
+      /* disegna sul canvas principale — stessa crop */
+      mainCtx.drawImage(stencilImg, sx, sy, sw, sh, 0, 0, canvasW, canvasH);
+
+      /* ghost identico per rilevare i pixel viola */
       const ghost = document.createElement('canvas');
       ghost.width  = canvasW;
       ghost.height = canvasH;
       const gCtx = ghost.getContext('2d');
-      gCtx.drawImage(stencilImg, 0, 0, canvasW, canvasH);
+      gCtx.drawImage(stencilImg, sx, sy, sw, sh, 0, 0, canvasW, canvasH);
 
       const imgD = gCtx.getImageData(0, 0, canvasW, canvasH);
       coverageMap = new Uint8Array(canvasW * canvasH);
@@ -1920,16 +1932,12 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
       burnedMap   = new Uint8Array(canvasW * canvasH);
       totalStPx   = 0;
 
-      /* rileva le linee viola: R e B alti, G basso */
+      /* rileva linee viola: R e B dominanti, G basso */
       for (let i = 0; i < imgD.data.length; i += 4) {
-        const r = imgD.data[i];
-        const g = imgD.data[i + 1];
-        const b = imgD.data[i + 2];
-        const a = imgD.data[i + 3];
-        /* viola/indaco: R > 80, B > 80, G < R-30, A > 100 */
+        const r = imgD.data[i], g = imgD.data[i+1],
+              b = imgD.data[i+2], a = imgD.data[i+3];
         if (a > 100 && r > 60 && b > 80 && g < r - 20 && g < b - 10) {
-          const idx = i >> 2;
-          coverageMap[idx] = 1;
+          coverageMap[i >> 2] = 1;
           totalStPx++;
         }
       }
@@ -1943,10 +1951,17 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
       canvas.addEventListener('touchmove',  onTouchMove,  { passive: false });
       canvas.addEventListener('touchend',   onUp);
 
-      /* ── cursore macchinetta solo su desktop e solo sul canvas ── */
+      /* ── cursore macchinetta solo su desktop ── */
       if (!isMobile) {
-        canvas.style.cursor =
-          "url('cursore-macchinetta.png') 10 86, crosshair";
+        const curImg = new Image();
+        curImg.onload = function () {
+          const cc = document.createElement('canvas');
+          cc.width = cc.height = 48;
+          cc.getContext('2d').drawImage(curImg, 0, 0, 48, 48);
+          /* hotspot: punta ago in basso-sinistra dell'icona 48x48 */
+          canvas.style.cursor = 'url(' + cc.toDataURL() + ') 7 42, crosshair';
+        };
+        curImg.src = 'cursore-macchinetta.png';
       }
     };
     stencilImg.src = 'stencil-ester-egg.jpg';
@@ -2002,7 +2017,7 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
     e.preventDefault();
   }
 
-  /* ── pittura + coverage con penalità fuori linee ── */
+  /* ── pittura + coverage con precisione al 95% ── */
   function paint (pt) {
     if (!mainCtx || !coverageMap) return;
     const W = canvasW, H = canvasH;
@@ -2026,7 +2041,7 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
     }
     mainCtx.restore();
 
-    /* controlla ogni pixel nel raggio del pennello */
+    /* raggio pennello */
     const r  = Math.ceil(W * 0.014);
     const r2 = r * r;
     const x0 = Math.max(0,   Math.floor(pt.x) - r);
@@ -2034,30 +2049,36 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
     const y0 = Math.max(0,   Math.floor(pt.y) - r);
     const y1 = Math.min(H-1, Math.ceil(pt.y)  + r);
 
-    /* verifica se il centro del tocco è ON stencil */
-    const cx  = Math.round(pt.x);
-    const cy  = Math.round(pt.y);
-    const cid = cy * W + cx;
-    const onLine = (cx >= 0 && cx < W && cy >= 0 && cy < H && coverageMap[cid] === 1);
+    /* conta pixel totali nel cerchio e quanti sono stencil */
+    let totalInCircle = 0, stencilInCircle = 0;
+    for (let py = y0; py <= y1; py++) {
+      for (let px = x0; px <= x1; px++) {
+        const dx = px - pt.x, dy = py - pt.y;
+        if (dx*dx + dy*dy > r2) continue;
+        totalInCircle++;
+        if (coverageMap[py * W + px]) stencilInCircle++;
+      }
+    }
+    /* precisione: % del cerchio che cade sulle linee */
+    const precision = totalInCircle > 0 ? stencilInCircle / totalInCircle : 0;
+    const onLine = precision >= 0.95;   /* soglia 95% */
 
     for (let py = y0; py <= y1; py++) {
       for (let px = x0; px <= x1; px++) {
-        const dx  = px - pt.x;
-        const dy  = py - pt.y;
+        const dx = px - pt.x, dy = py - pt.y;
         if (dx*dx + dy*dy > r2) continue;
         const idx = py * W + px;
 
         if (onLine) {
-          /* siamo DENTRO le linee: conta i pixel stencil coperti */
+          /* precisione OK: conta i pixel stencil nuovi */
           if (coverageMap[idx] && !coveredMap[idx] && !burnedMap[idx]) {
             coveredMap[idx] = 1;
             coveredPx++;
           }
         } else {
-          /* siamo FUORI dalle linee: brucia i pixel stencil vicini */
+          /* fuori linee: brucia quei pixel per sempre */
           if (coverageMap[idx] && !coveredMap[idx] && !burnedMap[idx]) {
             burnedMap[idx] = 1;
-            /* i burned pixels riducono permanentemente il massimo raggiungibile */
             totalStPx = Math.max(1, totalStPx - 1);
           }
         }
