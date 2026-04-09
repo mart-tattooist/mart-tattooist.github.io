@@ -17,6 +17,7 @@
   <style>
 
     :root {
+      
       --bg:       #0f0f0f;
       --surface:  #1a1a1a;
       --surface2: #222;
@@ -28,6 +29,16 @@
       --font: 'DM Sans', sans-serif;
       --gap: 1.2rem;
     }
+
+    /* --- EFFETTO FADE-IN IMMAGINI --- */
+    img:not(#splash img) {
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+    }
+    img.loaded {
+      opacity: 1;
+    }
+    /* -------------------------------- */
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -1878,7 +1889,7 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
       '<button id="egg-x">×</button>' +
       '<div class="egg-hd">' +
         '<div class="egg-ttl">Hai sbloccato un easter egg!</div>' +
-        '<div class="egg-sub">Tieni premuto e segui le linee viola dello stencil. Se esci dalle linee, quella parte è persa per sempre…</div>' +
+        '<div class="egg-sub">Tieni premuto e segui le linee viola dello stencil.</div>' +
       '</div>' +
       '<canvas id="egg-cv"></canvas>' +
       '<div class="egg-pw">' +
@@ -2236,6 +2247,29 @@ document.addEventListener('gesturestart',  e => e.preventDefault(), { passive: f
 document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 document.addEventListener('gestureend',    e => e.preventDefault(), { passive: false });
 
+</script>
+<script>
+  // Questo codice controlla quando le immagini sono pronte
+  function applicaFadeIn() {
+    var immagini = document.querySelectorAll('img:not(#splash img)');
+    immagini.forEach(function(img) {
+      // Se l'immagine è già caricata (cache)
+      if (img.complete) {
+        img.classList.add('loaded');
+      } else {
+        // Se deve ancora caricarsi, aspetta il "load"
+        img.addEventListener('load', function() {
+          img.classList.add('loaded');
+        });
+        // Se c'è un errore, la mostriamo comunque per sicurezza
+        img.addEventListener('error', function() {
+          img.classList.add('loaded');
+        });
+      }
+    });
+  }
+  // Avvia il controllo
+  applicaFadeIn();
 </script>
 </body>
 </html>
