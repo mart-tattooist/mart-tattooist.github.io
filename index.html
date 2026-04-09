@@ -35,10 +35,10 @@
       opacity: 0;
       transition: opacity 0.8s ease-in-out;
     }
+    /* Questa riga assicura che se l'immagine ha la classe 'loaded', sia visibile */
     img.loaded {
-      opacity: 1;
+      opacity: 1 !important;
     }
-    /* -------------------------------- */
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -2249,27 +2249,42 @@ document.addEventListener('gestureend',    e => e.preventDefault(), { passive: f
 
 </script>
 <script>
-  // Questo codice controlla quando le immagini sono pronte
-  function applicaFadeIn() {
-    var immagini = document.querySelectorAll('img:not(#splash img)');
+  function attivaEffettoFade() {
+    // Cerchiamo tutte le immagini che non sono ancora state "attivate"
+    var immagini = document.querySelectorAll('img:not(#splash img):not(.loaded)');
+    
     immagini.forEach(function(img) {
-      // Se l'immagine è già caricata (cache)
-      if (img.complete) {
+      // Se l'immagine è già pronta o è piccolissima (già in memoria)
+      if (img.complete && img.naturalWidth > 0) {
         img.classList.add('loaded');
       } else {
-        // Se deve ancora caricarsi, aspetta il "load"
+        // Altrimenti aspettiamo che finisca di caricare
         img.addEventListener('load', function() {
           img.classList.add('loaded');
         });
-        // Se c'è un errore, la mostriamo comunque per sicurezza
+        // Se c'è un errore di caricamento, la mostriamo comunque invece di lasciarla nera
         img.addEventListener('error', function() {
           img.classList.add('loaded');
         });
       }
     });
   }
-  // Avvia il controllo
-  applicaFadeIn();
+
+  // Eseguiamo il controllo subito
+  attivaEffettoFade();
+
+  // IMPORTANTE: Eseguiamo il controllo anche ogni volta che l'utente clicca sui menu
+  // così le foto nelle altre pagine appaiono correttamente
+  document.querySelectorAll('.nav-links button').forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Aspettiamo un attimo che la pagina cambi e poi attiviamo il fade
+      setTimeout(attivaEffettoFade, 100);
+    });
+  });
+
+  // Controlliamo anche quando si apre il Lightbox (le foto grandi)
+  const observer = new MutationObserver(attivaEffettoFade);
+  observer.observe(document.body, { childList: true, subtree: true });
 </script>
 </body>
 </html>
