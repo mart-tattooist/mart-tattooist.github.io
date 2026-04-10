@@ -938,35 +938,6 @@
     @keyframes splashLogoIn {
       to { opacity: 1; transform: scale(1); }
     }
-    /* --- OTTIMIZZAZIONE DESCRIZIONI MOBILE --- */
-    @media (max-width: 768px) {
-      /* Forza la cella a essere larga quanto la foto */
-      .item-info {
-        width: 100% !important;
-        left: 0 !important;
-        right: 0 !important;
-        padding: 15px !important;
-        box-sizing: border-box !important;
-      }
-
-      /* Rende il testo scorrevole quando clicchi 'Altro' */
-      .item-desc.expanded {
-        max-height: 180px !important; /* Altezza massima del box di testo */
-        overflow-y: auto !important;  /* Attiva lo scorrimento verticale */
-        display: block !important;
-        padding-right: 10px;
-        -webkit-overflow-scrolling: touch; /* Rende lo scorrimento fluido su iPhone */
-      }
-
-      /* Rende la barra di scorrimento piccola e carina */
-      .item-desc.expanded::-webkit-scrollbar {
-        width: 4px;
-      }
-      .item-desc.expanded::-webkit-scrollbar-thumb {
-        background: var(--accent);
-        border-radius: 10px;
-      }
-    } /* <--- QUESTA PARENTESI È FONDAMENTALE */
   </style>
 </head>
 <body>
