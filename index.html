@@ -938,6 +938,37 @@
     @keyframes splashLogoIn {
       to { opacity: 1; transform: scale(1); }
     }
+    /* --- FINE DELLE TUE REGOLE PRECEDENTI --- */
+    }  
+
+    /* --- OTTIMIZZAZIONE DESCRIZIONI MOBILE (COPIA DA QUI) --- */
+    @media (max-width: 768px) {
+      .item-info {
+        width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        padding: 15px !important;
+        box-sizing: border-box !important;
+      }
+
+      .item-desc.expanded {
+        max-height: 180px !important;
+        overflow-y: auto !important;
+        display: block !important;
+        padding-right: 10px;
+        -webkit-overflow-scrolling: touch;
+      }
+  
+      .item-desc.expanded::-webkit-scrollbar {
+        width: 4px;
+      }
+      .item-desc.expanded::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 10px;
+      }
+   } 
+   /* --- FINE BLOCCO MOBILE --- */
+
   </style>
 </head>
 <body>
