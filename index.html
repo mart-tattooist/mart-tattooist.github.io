@@ -811,31 +811,33 @@
     }
 
     /* --- MODIFICHE MOBILE --- */
+    /* --- OTTIMIZZAZIONE TESTO MOBILE "SWIPE" --- */
     @media (max-width: 768px) {
-      nav { padding: 0 1.2rem; }
-      .nav-logo img { max-height: 28px; } /* Logo più piccolo */
-  
-      .menu-toggle {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        width: 28px; height: 22px;
-       background: none; border: none; cursor: pointer;
-      }
-      .menu-toggle span {
-        display: block; height: 2px; width: 100%;
-        background: #888; /* Grigio chiaro come richiesto */
-        transition: 0.3s;
+      /* La cella di testo diventa larga quanto la foto */
+      .item-info {
+        width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        padding: 15px !important;
+        box-sizing: border-box !important;
       }
 
-      .nav-links {
-        display: none; /* Nasconde il menu di default */
-        position: absolute; top: 64px; left: 0; right: 0;
-        background: var(--bg); flex-direction: column;
-        padding: 1rem 0; border-bottom: 1px solid var(--border);
+      /* Quando clicchi "altro", il testo diventa scorrevole ma la barra sparisce */
+      .item-desc.expanded {
+        max-height: 150px !important; /* Limite altezza per non coprire tutto */
+        overflow-y: scroll !important; /* Permette lo swipe verticale */
+        display: block !important;
+        -webkit-overflow-scrolling: touch; /* Rende lo swipe fluido su iPhone */
+        
+        /* Nasconde la barra di scorrimento su Chrome, Safari e Opera */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE e Edge */
       }
-      .nav-links.mobile-open { display: flex; } /* Mostra al clic */
-      .nav-links button { width: 100%; padding: 1.2rem 2rem; text-align: left; }
+
+      /* Nasconde la barra di scorrimento su Chrome e Safari */
+      .item-desc.expanded::-webkit-scrollbar {
+        display: none;
+      }
     }
 
     /* ══════════════════════════════════════════
@@ -938,37 +940,6 @@
     @keyframes splashLogoIn {
       to { opacity: 1; transform: scale(1); }
     }
-    /* --- FINE DELLE TUE REGOLE PRECEDENTI --- */
-    }  
-
-    /* --- OTTIMIZZAZIONE DESCRIZIONI MOBILE (COPIA DA QUI) --- */
-    @media (max-width: 768px) {
-      .item-info {
-        width: 100% !important;
-        left: 0 !important;
-        right: 0 !important;
-        padding: 15px !important;
-        box-sizing: border-box !important;
-      }
-
-      .item-desc.expanded {
-        max-height: 180px !important;
-        overflow-y: auto !important;
-        display: block !important;
-        padding-right: 10px;
-        -webkit-overflow-scrolling: touch;
-      }
-  
-      .item-desc.expanded::-webkit-scrollbar {
-        width: 4px;
-      }
-      .item-desc.expanded::-webkit-scrollbar-thumb {
-        background: var(--accent);
-        border-radius: 10px;
-      }
-   } 
-   /* --- FINE BLOCCO MOBILE --- */
-
   </style>
 </head>
 <body>
