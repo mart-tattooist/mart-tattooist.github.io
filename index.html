@@ -595,27 +595,28 @@
        (usa --app-height settato via JS invece di dvh)
     ══════════════════════════════════════════ */
     @media (max-width: 680px) {
-      /* 1. Cambiamo il contenitore principale per non forzare l'altezza piena */
+      /* 1. Il pannello occupa tutto lo schermo e scrolla verticalmente */
       .lb-panel {
         flex-direction: column;
         width: 100vw;
-      /* Rimuoviamo o cambiamo l'altezza fissa per permettere al contenuto di stare in alto */
-        height: auto !important; 
-        max-height: 90vh; 
+        height: 100vh !important;
+        max-height: 100vh !important;
         border-radius: 0;
         background: #000;
-        overflow-y: auto; /* Permette lo scroll se il testo è lungo */
-        justify-content: flex-start !important; /* Spinge tutto verso l'alto */
+        overflow-y: auto;
+        overflow-x: hidden;
+        justify-content: flex-start !important;
         align-items: stretch;
-        margin-top: 20px; /* Opzionale: un piccolo margine dal bordo superiore del telefono */
+        margin-top: 0;
+        -webkit-overflow-scrolling: touch;
       }
 
-      /* 2. L'immagine non deve più "spingere" verso il basso */
+      /* 2. L'immagine si adatta senza occupare troppo spazio */
       .lb-img-col {
-        flex: 0 0 auto !important; /* Non si espande più per riempire il vuoto */
+        flex: 0 0 auto !important;
         width: 100%;
         min-height: 0;
-        display: block; 
+        display: block;
         background: #000;
       }
 
@@ -626,22 +627,23 @@
       }
 
       .lb-slide img, .lb-slide video {
-        max-height: 60vh !important; /* Limita l'altezza dell'immagine per far stare tutto in alto */
+        max-height: 50vh !important;
         width: auto;
         margin: 0 auto;
       }
 
-      /* 3. I pallini e la sidebar seguiranno naturalmente l'immagine */
+      /* 3. Pallini tra foto e testo */
       .lb-dots {
         padding: 1rem 0;
         position: relative;
         bottom: 0;
       }
 
+      /* 4. Sidebar a larghezza piena, cresce col testo */
       .lb-sidebar {
         flex: 0 0 auto !important;
-        width: 100% !important;   /* occupa tutta la larghezza della foto */
-        padding: 0 1.5rem 2rem; /* Spazio sotto il testo */
+        width: 100% !important;
+        padding: 0 1.5rem 2.5rem;
       }
 
       .lb-caption-wrapper {
@@ -657,12 +659,12 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
+      /* Espanso: mostra tutto, il pannello scrolla */
       .lb-caption.expanded {
-        display: block;            /* disabilita -webkit-box per mostrare tutto */
+        display: block;
         -webkit-line-clamp: unset;
-        overflow-y: auto;          /* scroll interno se il testo è molto lungo */
-        max-height: 45vh;          /* altezza massima prima che scatti lo scroll */
-        -webkit-overflow-scrolling: touch;
+        overflow: visible;
+        max-height: none;
       }
       .lb-more-btn {
         color: var(--muted);
@@ -671,7 +673,7 @@
         margin-top: 4px;
         align-self: flex-start;
       }
-    } /* <--- QUESTA PARENTESI MANCAVA! Chiude il blocco mobile */
+    } /* chiude il blocco mobile */
     
     /* Regola base per nascondere il tasto su computer */
     @media (min-width: 681px) {
