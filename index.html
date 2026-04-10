@@ -595,7 +595,7 @@
        (usa --app-height settato via JS invece di dvh)
     ══════════════════════════════════════════ */
     @media (max-width: 680px) {
-      /* 1. Il pannello occupa tutto lo schermo e scrolla verticalmente */
+      /* 1. Il pannello occupa tutto lo schermo e scrolla come una pagina */
       .lb-panel {
         flex-direction: column;
         width: 100vw;
@@ -605,19 +605,25 @@
         background: #000;
         overflow-y: auto;
         overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
         justify-content: flex-start !important;
         align-items: stretch;
         margin-top: 0;
-        -webkit-overflow-scrolling: touch;
       }
 
-      /* 2. L'immagine si adatta senza occupare troppo spazio */
+      /* 2. L'area immagine NON deve più prendere tutta l'altezza del pannello */
       .lb-img-col {
         flex: 0 0 auto !important;
         width: 100%;
+        height: auto !important;   /* CHIAVE: impedisce che riempia il 100vh */
         min-height: 0;
         display: block;
         background: #000;
+      }
+
+      /* Anche lb-slider-wrap e lb-slide devono avere altezza automatica */
+      #lb-slider-wrap {
+        height: auto !important;
       }
 
       .lb-slide {
@@ -627,7 +633,7 @@
       }
 
       .lb-slide img, .lb-slide video {
-        max-height: 50vh !important;
+        max-height: 55vh !important;
         width: auto;
         margin: 0 auto;
       }
@@ -659,7 +665,7 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
-      /* Espanso: mostra tutto, il pannello scrolla */
+      /* Espanso: tutto il testo visibile, il pannello scrolla verso il basso */
       .lb-caption.expanded {
         display: block;
         -webkit-line-clamp: unset;
