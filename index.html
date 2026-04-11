@@ -658,9 +658,12 @@
         overflow: hidden;
       }
       .lb-caption.expanded {
-        display: block;               /* Sostituisce il -webkit-box per mostrare tutto */
+        display: block;
         -webkit-line-clamp: unset;
-        overflow: visible;
+        overflow-y: auto;                        /* Scorrimento solo sul testo */
+        -webkit-overflow-scrolling: touch;       /* Scroll fluido su iOS */
+        max-height: 38vh;                        /* Altezza massima: il testo scorre dentro */
+        overscroll-behavior: contain;            /* Evita che lo scroll "sfugga" al pannello */
       }
       .lb-more-btn {
         color: var(--muted);
