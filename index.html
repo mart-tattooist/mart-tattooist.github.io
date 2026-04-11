@@ -792,18 +792,31 @@
       font-size: 0.68rem; letter-spacing: 0.14em;
       text-transform: uppercase; color: var(--muted);
     }
-    @media (max-width: 480px) { footer { flex-direction: column; gap: 0.4rem; text-align: center; } }
-
-    /* ──────── FOOTER ──────── */
-    
-    footer {
-      padding: 1.6rem 2.5rem;
-      border-top: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.68rem; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--muted);
+    .footer-left {
+      display: flex; align-items: center; gap: 1.2rem;
     }
-    @media (max-width: 480px) { footer { flex-direction: column; gap: 0.4rem; text-align: center; } }
+    .footer-privacy {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: color 0.22s;
+      cursor: pointer;
+    }
+    .footer-privacy:hover { color: var(--accent); }
+    @media (max-width: 480px) {
+      footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+      .footer-left {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+      }
+    }
    
     /* Nasconde il tasto menu su Desktop per evitare l'effetto "puntino" */
     .menu-toggle {
@@ -1130,7 +1143,10 @@
   </div>
 
   <footer>
-    <span>© 2026</span>
+    <div class="footer-left">
+      <span>© 2026</span>
+      <a class="footer-privacy" href="privacy.html">Privacy Policy</a>
+    </div>
     <span>P.IVA 02749090342</span>
   </footer>
 </section>
@@ -1268,7 +1284,10 @@
   </div>
 
   <footer>
-    <span>© 2026</span>
+    <div class="footer-left">
+      <span>© 2026</span>
+      <a class="footer-privacy" href="privacy.html">Privacy Policy</a>
+    </div>
     <span>P.IVA 02749090342</span>
   </footer>
 </section>
@@ -1349,7 +1368,10 @@
   </div>
 
   <footer>
-    <span>© 2026</span>
+    <div class="footer-left">
+      <span>© 2026</span>
+      <a class="footer-privacy" href="privacy.html">Privacy Policy</a>
+    </div>
     <span>P.IVA 02749090342</span>
   </footer>
 </section>
@@ -1447,7 +1469,10 @@
   </div>
 
   <footer>
-    <span>© 2026</span>
+    <div class="footer-left">
+      <span>© 2026</span>
+      <a class="footer-privacy" href="privacy.html">Privacy Policy</a>
+    </div>
     <span>P.IVA 02749090342</span>
   </footer>
 </section>

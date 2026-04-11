@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Privacy Policy — MART</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #0f0f0f;
+      --surface:  #1a1a1a;
+      --surface2: #222;
+      --border:   #2e2e2e;
+      --text:     #f0ece8;
+      --muted:    #888;
+      --accent:   #c9a96e;
+      --font: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow-x: hidden;
+    }
+
+    /* ──────── NAVBAR ──────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+      background: rgba(15,15,15,0.95);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      height: 100%;
+      text-decoration: none;
+      font-family: var(--font);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--text);
+    }
+    .nav-logo img {
+      max-height: 36px;
+      width: auto;
+      display: block;
+    }
+
+    .nav-back {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: var(--font);
+      font-weight: 300;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.22s;
+      padding: 0.2rem 0;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-back:hover { color: var(--text); }
+    .nav-back svg {
+      width: 14px; height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ──────── CONTENUTO ──────── */
+    main {
+      padding-top: 64px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-header {
+      padding: 2.8rem 2.5rem 1.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header h1 {
+      font-family: var(--font);
+      font-size: 2rem;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+      border-left: 2px solid var(--accent);
+      padding-left: 1.2rem;
+    }
+    .page-header p {
+      margin-top: 0.5rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-left: 1.2rem;
+    }
+
+    /* ──────── TESTO PRIVACY ──────── */
+    .privacy-content {
+      padding: 2.5rem 2.5rem 4rem;
+      max-width: 820px;
+    }
+
+    .privacy-content h2 {
+      font-family: var(--font);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 2.8rem;
+      margin-bottom: 1rem;
+    }
+    .privacy-content h2:first-child { margin-top: 0; }
+
+    .privacy-content p {
+      font-size: 0.88rem;
+      line-height: 1.85;
+      color: rgba(240,236,232,0.78);
+      font-weight: 300;
+      margin-bottom: 0.9rem;
+    }
+
+    .privacy-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0.9rem;
+    }
+    .privacy-content ul li {
+      font-size: 0.88rem;
+      line-height: 1.85;
+      color: rgba(240,236,232,0.78);
+      font-weight: 300;
+      padding-left: 1.2rem;
+      position: relative;
+    }
+    .privacy-content ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 300;
+    }
+
+    .privacy-content a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .privacy-content a:hover { opacity: 0.75; }
+
+    .privacy-content .placeholder {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+
+    /* ──────── FOOTER ──────── */
+    footer {
+      margin-top: auto;
+      padding: 1.6rem 2.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .footer-privacy {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: color 0.22s;
+    }
+    .footer-privacy:hover { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 1.2rem; }
+      .page-header { padding: 2rem 1.2rem 1.4rem; }
+      .privacy-content { padding: 2rem 1.2rem 3rem; }
+      footer { padding: 1.6rem 1.2rem; }
+    }
+
+    @media (max-width: 480px) {
+      .page-header h1 { font-size: 1.5rem; }
+      footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+      .footer-left {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="logo.png" alt="MART"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline'">
+    <span style="display:none">MART</span>
+  </a>
+  <a class="nav-back" href="index.html">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Indietro
+  </a>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Privacy Policy</h1>
+    <p>Informativa sul trattamento dei dati personali</p>
+  </div>
+
+  <div class="privacy-content">
+
+    <h2>Ai sensi degli Artt. 13 e 14 del Regolamento UE 2016/679 — GDPR</h2>
+
+    <h2>1. Titolare del trattamento</h2>
+    <p>Il Titolare del trattamento è:</p>
+    <ul>
+      <li><span class="placeholder">[Tuo Nome e Cognome]</span></li>
+      <li>Sede Legale/Operativa: <span class="placeholder">[Inserisci Indirizzo dello studio o Città/CAP]</span></li>
+      <li>P.IVA: <span class="placeholder">[Inserisci la tua Partita IVA]</span></li>
+      <li>Email: <span class="placeholder">[Inserisci l'indirizzo email dedicato]</span></li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <h2>2. Tipologia di dati trattati</h2>
+    <p>Il Titolare raccoglie e tratta le seguenti categorie di dati:</p>
+    <ul>
+      <li><strong>Dati Identificativi:</strong> Nome, cognome, data di nascita (per verifica della maggiore età).</li>
+      <li><strong>Dati di Contatto:</strong> Indirizzo email, numero di telefono.</li>
+      <li><strong>Dati di Navigazione:</strong> Indirizzi IP, log di sistema (gestiti tecnicamente dall'hosting GitHub Pages).</li>
+      <li><strong>Dati Particolari (Sanitari):</strong> Informazioni fornite volontariamente dall'utente riguardo allergie, patologie o assunzione di farmaci, necessarie esclusivamente per la sicurezza del trattamento di tatuaggio.</li>
+      <li><strong>Immagini:</strong> Fotografie dei tatuaggi eseguiti (previo consenso specifico per finalità di portfolio).</li>
+    </ul>
+
+    <h2>3. Finalità e base giuridica del trattamento</h2>
+    <p>I dati sono trattati per le seguenti finalità:</p>
+    <ul>
+      <li><strong>Gestione richieste e appuntamenti:</strong> Rispondere a preventivi e organizzare le sedute. Base giuridica: Esecuzione di misure precontrattuali/contrattuali.</li>
+      <li><strong>Obblighi di Legge e Sanitari:</strong> Rispetto delle normative igienico-sanitarie e fiscali (fatturazione). Base giuridica: Obbligo legale.</li>
+      <li><strong>Tutela della Salute:</strong> Valutazione di idoneità al tatuaggio per prevenire reazioni avverse. Base giuridica: Consenso esplicito dell'interessato.</li>
+      <li><strong>Portfolio e Marketing:</strong> Pubblicazione di foto dei lavori sui social/sito. Base giuridica: Consenso esplicito (liberatoria).</li>
+    </ul>
+
+    <h2>4. Modalità di trattamento e conservazione</h2>
+    <p>Il trattamento avviene con strumenti informatici (tramite il sito e servizi di messaggistica) e cartacei (moduli di consenso in studio). I dati sono protetti da misure di sicurezza idonee a prevenirne la perdita o l'accesso non autorizzato.</p>
+    <ul>
+      <li><strong>Dati dei contatti:</strong> Conservati per 24 mesi dall'ultima interazione se non segue una prestazione.</li>
+      <li><strong>Dati fiscali e sanitari:</strong> Conservati per 10 anni come richiesto dalle norme vigenti.</li>
+    </ul>
+
+    <h2>5. Comunicazione dei dati e trasferimento all'estero</h2>
+    <p>I dati potranno essere comunicati a:</p>
+    <ul>
+      <li>Fornitori di servizi tecnici (Hosting GitHub Pages, servizi di posta elettronica).</li>
+      <li>Consulenti fiscali (commercialista).</li>
+      <li>Autorità sanitarie o giudiziarie (su richiesta).</li>
+    </ul>
+    <p>Il sito è ospitato su GitHub Pages (GitHub Inc.); il trasferimento dei dati extra-UE avviene in conformità alle Clausole Contrattuali Standard previste dal GDPR.</p>
+
+    <h2>6. Diritti dell'interessato</h2>
+    <p>Ai sensi degli Artt. 15–22 del GDPR, l'utente può esercitare in qualsiasi momento il diritto di:</p>
+    <ul>
+      <li>Accedere ai propri dati e chiederne copia.</li>
+      <li>Chiedere la rettifica o la cancellazione dei dati.</li>
+      <li>Revocare il consenso prestato (senza pregiudicare la liceità del trattamento precedente).</li>
+      <li>Opporsi al trattamento per finalità di marketing.</li>
+      <li>Proporre reclamo al Garante per la Protezione dei Dati Personali (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">www.garanteprivacy.it</a>).</li>
+    </ul>
+    <p>Per esercitare i diritti, inviare una email a: <span class="placeholder">[Inserisci Tua Email]</span>.</p>
+
+    <h2>7. Cookie Policy</h2>
+    <p>Questo sito è una piattaforma statica su GitHub Pages. Non utilizza cookie di profilazione propri. Potrebbero essere presenti cookie tecnici necessari alla navigazione o cookie di terze parti (es. se incorpori mappe o video). L'utente può gestire le preferenze sui cookie tramite le impostazioni del proprio browser.</p>
+
+    <div class="divider"></div>
+
+    <p style="font-size:0.75rem; color: var(--muted); letter-spacing: 0.08em;">
+      Ultimo aggiornamento: <span class="placeholder">[Inserisci Data di oggi]</span>
+    </p>
+
+  </div>
+
+  <footer>
+    <div class="footer-left">
+      <span>© 2026</span>
+      <a class="footer-privacy" href="privacy.html">Privacy Policy</a>
+    </div>
+    <span>P.IVA 02749090342</span>
+  </footer>
+</main>
+
+</body>
+</html>
