@@ -1822,11 +1822,14 @@ document.getElementById('lb-main').addEventListener('touchstart', e => {
   touchOnVideo = !!e.target.closest('.lb-video-wrap');
 }, { passive: false });
 
-/* Blocca pull-to-refresh e overscroll quando la lightbox è aperta */
+/* Blocca pull-to-refresh e overscroll quando la lightbox è aperta,
+   MA lascia scorrere il testo espanso della didascalia */
 document.getElementById('lightbox').addEventListener('touchmove', e => {
-  if (document.getElementById('lightbox').classList.contains('open')) {
-    e.preventDefault();
-  }
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  /* Se il tocco è dentro la caption espansa, lascia scorrere */
+  const caption = e.target.closest('#lb-caption');
+  if (caption && caption.classList.contains('expanded')) return;
+  e.preventDefault();
 }, { passive: false });
 
 document.getElementById('lb-main').addEventListener('touchend', e => {
