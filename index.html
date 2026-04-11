@@ -2010,7 +2010,7 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
           cc.width = cc.height = 48;
           cc.getContext('2d').drawImage(curImg, 0, 0, 48, 48);
           /* hotspot: punta ago in basso-sinistra dell'icona 48x48 */
-          canvas.style.cursor = 'url(' + cc.toDataURL() + ') 7 42, crosshair';
+          canvas.style.cursor = 'url(' + cc.toDataURL() + ') 2 46, crosshair';
         };
         curImg.src = 'cursore-macchinetta.png';
       }
@@ -2100,19 +2100,20 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
     const y0 = Math.max(0,   Math.floor(pt.y) - r);
     const y1 = Math.min(H-1, Math.ceil(pt.y)  + r);
 
-    /* conta pixel totali nel cerchio e quanti sono stencil */
-    let totalInCircle = 0, stencilInCircle = 0;
-    for (let py = y0; py <= y1; py++) {
-      for (let px = x0; px <= x1; px++) {
+    /* controlla se il punto centrale è sopra (o vicinissimo a) una linea stencil —
+       raggio di controllo piccolo (3px) indipendente dal raggio di pittura */
+    const cr  = 3;
+    const cr2 = cr * cr;
+    let centerOnLine = false;
+    outer:
+    for (let py = Math.max(0, Math.floor(pt.y) - cr); py <= Math.min(H-1, Math.ceil(pt.y) + cr); py++) {
+      for (let px = Math.max(0, Math.floor(pt.x) - cr); px <= Math.min(W-1, Math.ceil(pt.x) + cr); px++) {
         const dx = px - pt.x, dy = py - pt.y;
-        if (dx*dx + dy*dy > r2) continue;
-        totalInCircle++;
-        if (coverageMap[py * W + px]) stencilInCircle++;
+        if (dx*dx + dy*dy > cr2) continue;
+        if (coverageMap[py * W + px]) { centerOnLine = true; break outer; }
       }
     }
-    /* precisione: % del cerchio che cade sulle linee */
-    const precision = totalInCircle > 0 ? stencilInCircle / totalInCircle : 0;
-    const onLine = precision >= 0.95;   /* soglia 95% */
+    const onLine = centerOnLine;
 
     for (let py = y0; py <= y1; py++) {
       for (let px = x0; px <= x1; px++) {
