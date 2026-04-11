@@ -640,7 +640,8 @@
 
       .lb-sidebar {
         flex: 0 0 auto !important;
-        padding: 0 1.5rem 2rem; /* Spazio sotto il testo */
+        width: 100% !important;        /* Occupa tutta la larghezza della foto */
+        padding: 0 1.5rem 2rem;
       }
 
       .lb-caption-wrapper {
@@ -657,7 +658,9 @@
         overflow: hidden;
       }
       .lb-caption.expanded {
+        display: block;               /* Sostituisce il -webkit-box per mostrare tutto */
         -webkit-line-clamp: unset;
+        overflow: visible;
       }
       .lb-more-btn {
         color: var(--muted);
