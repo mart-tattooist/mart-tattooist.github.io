@@ -1914,7 +1914,7 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
       '0 0 0 ' + (clickCount * 3) + 'px rgba(201,169,110,' + (glow * 0.45) + ')';
     if (clickCount >= 10) {
       photoWrap.removeEventListener('click', onPhotoClick);
-      setTimeout(spawnEgg, 350);
+      setTimeout(function() { window.location.href = 'easter-egg.html'; }, 350);
     }
   }
 

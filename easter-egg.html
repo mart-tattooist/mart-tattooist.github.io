@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Easter Egg — MART</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0a0a0a;
+      --border:  #2e2e2e;
+      --text:    #f0ece8;
+      --muted:   #888;
+      --accent:  #c9a96e;
+      --font:    'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      height: 100%;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ── layout ── */
+    #egg-shell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      height: 100vh;
+      gap: 0.9rem;
+      padding: 1rem;
+    }
+
+    /* ── header testo ── */
+    .egg-hd {
+      text-align: center;
+      max-width: 440px;
+    }
+    .egg-ttl {
+      font-size: 1.1rem;
+      font-weight: 300;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.04em;
+    }
+    .egg-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── canvas ── */
+    #egg-cv {
+      border-radius: 8px;
+      touch-action: none;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* ── barra punteggio ── */
+    .egg-pw {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .egg-pl {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .egg-pt {
+      height: 3px;
+      background: #2e2e2e;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #egg-pf {
+      height: 100%;
+      width: 100%;           /* inizia a 100% */
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.2s, background 0.4s;
+    }
+
+    /* ── tasto chiudi ── */
+    #egg-x {
+      position: fixed;
+      top: 1rem; right: 1.4rem;
+      background: none; border: none;
+      color: #666; font-size: 1.9rem;
+      cursor: pointer; z-index: 10;
+      line-height: 1; transition: color 0.2s;
+      font-family: var(--font);
+    }
+    #egg-x:hover { color: var(--text); }
+
+    /* ── schermata vittoria ── */
+    #egg-win {
+      display: none;
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,0.92);
+      align-items: center; justify-content: center;
+      padding: 2rem;
+      animation: fadeIn .5s ease;
+    }
+    #egg-win.show { display: flex; }
+    .egg-win-inner {
+      text-align: center;
+      max-width: 380px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.85rem;
+    }
+    .egg-win-h  { font-size: 1.9rem; font-weight: 300; color: var(--accent); }
+    .egg-win-p  { font-size: 0.9rem; color: var(--text); line-height: 1.7; }
+    .egg-win-score {
+      font-size: 3rem; font-weight: 500;
+      letter-spacing: 0.1em; color: var(--accent);
+    }
+    .egg-win-score-label {
+      font-size: 0.68rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--muted);
+      margin-top: -0.4rem;
+    }
+    .egg-win-code {
+      font-size: 1.8rem; font-weight: 500;
+      letter-spacing: 0.28em; color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: .55rem 1.8rem; border-radius: 4px;
+    }
+    .egg-win-hint { font-size: .73rem; color: var(--muted); letter-spacing: .05em; }
+    .egg-win-hint strong { color: var(--text); }
+    #egg-win-btn {
+      margin-top: .3rem; background: none;
+      border: 1px solid #444; color: #888;
+      font-size: .76rem; letter-spacing: .14em;
+      text-transform: uppercase; padding: .55rem 1.6rem;
+      cursor: pointer; border-radius: 2px;
+      transition: all .2s; font-family: var(--font);
+    }
+    #egg-win-btn:hover { border-color: var(--accent); color: var(--text); }
+
+    /* ── schermata start ── */
+    #egg-start {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.55);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      z-index: 5;
+    }
+    #egg-start.hide { opacity: 0; pointer-events: none; }
+    .egg-start-label {
+      font-size: 0.78rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 0.7rem 1.6rem; border-radius: 2px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .canvas-wrap { position: relative; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+<div id="egg-shell">
+  <div class="egg-hd">
+    <div class="egg-ttl">Hai sbloccato un easter egg!</div>
+    <div class="egg-sub">Segui le linee viola dello stencil dal principio alla fine.<br>Ogni deviazione riduce la precisione.</div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="egg-cv"></canvas>
+    <div id="egg-start"><span class="egg-start-label">Tocca per iniziare</span></div>
+  </div>
+
+  <div class="egg-pw">
+    <div class="egg-pl">
+      <span>Precisione</span>
+      <span id="egg-pct">100%</span>
+    </div>
+    <div class="egg-pt"><div id="egg-pf"></div></div>
+  </div>
+</div>
+
+<button id="egg-x" onclick="goBack()">×</button>
+
+<!-- schermata vittoria -->
+<div id="egg-win">
+  <div class="egg-win-inner">
+    <h2 class="egg-win-h">Tatuaggio completato!</h2>
+    <div class="egg-win-score" id="win-score">100%</div>
+    <div class="egg-win-score-label">Precisione finale</div>
+    <p class="egg-win-p">Hai terminato lo stencil.<br>Mostra questo codice a MART per ottenere il tuo sconto.</p>
+    <div class="egg-win-code">M4R73</div>
+    <p class="egg-win-hint"><strong>20% di sconto</strong> sul tuo prossimo tatuaggio.</p>
+    <button id="egg-win-btn" onclick="goBack()">Chiudi</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+  /* ── canvas setup ── */
+  const canvas   = document.getElementById('egg-cv');
+  const startEl  = document.getElementById('egg-start');
+  const pctEl    = document.getElementById('egg-pct');
+  const fillEl   = document.getElementById('egg-pf');
+  const winEl    = document.getElementById('egg-win');
+  const winScore = document.getElementById('win-score');
+
+  const dpr   = Math.min(window.devicePixelRatio || 1, 2);
+  const maxSz = Math.min(480, window.innerWidth * 0.9, window.innerHeight * 0.58);
+  const size  = Math.floor(maxSz);
+  canvas.style.width  = size + 'px';
+  canvas.style.height = size + 'px';
+  const canvasW = Math.round(size * dpr);
+  const canvasH = Math.round(size * dpr);
+  canvas.width  = canvasW;
+  canvas.height = canvasH;
+  const ctx = canvas.getContext('2d');
+
+  /* ── stato gioco ── */
+  let started      = false;
+  let wonAlready   = false;
+  let coverageMap  = null;   // 1 = pixel viola stencil
+  let visitedMap   = null;   // 1 = percorso viola già toccato
+  let totalStPx    = 0;
+  let visitedPx    = 0;
+  let totalSamples = 0;      // ogni evento move = 1 sample
+  let offSamples   = 0;      // samples in cui il centro era fuori linea
+  let lastPt       = null;
+  let machineAudio = null;
+
+  /* ── carica stencil ── */
+  function coverCrop(iw, ih, dw, dh) {
+    const ia = iw / ih, da = dw / dh;
+    let sx, sy, sw, sh;
+    if (ia > da) { sh = ih; sw = ih * da; sx = (iw - sw) / 2; sy = 0; }
+    else         { sw = iw; sh = iw / da; sx = 0; sy = (ih - sh) / 2; }
+    return { sx, sy, sw, sh };
+  }
+
+  const stencilImg = new Image();
+  stencilImg.onload = function () {
+    const { sx, sy, sw, sh } = coverCrop(
+      stencilImg.naturalWidth, stencilImg.naturalHeight, canvasW, canvasH);
+
+    /* disegna stencil sul canvas */
+    ctx.drawImage(stencilImg, sx, sy, sw, sh, 0, 0, canvasW, canvasH);
+
+    /* ghost per rilevare pixel viola */
+    const ghost = document.createElement('canvas');
+    ghost.width = canvasW; ghost.height = canvasH;
+    const gCtx = ghost.getContext('2d');
+    gCtx.drawImage(stencilImg, sx, sy, sw, sh, 0, 0, canvasW, canvasH);
+    const imgD = gCtx.getImageData(0, 0, canvasW, canvasH);
+
+    coverageMap = new Uint8Array(canvasW * canvasH);
+    visitedMap  = new Uint8Array(canvasW * canvasH);
+    totalStPx   = 0;
+
+    /* rileva linee viola: R e B dominanti, G basso */
+    for (let i = 0; i < imgD.data.length; i += 4) {
+      const r = imgD.data[i], g = imgD.data[i+1],
+            b = imgD.data[i+2], a = imgD.data[i+3];
+      if (a > 100 && r > 60 && b > 80 && g < r - 20 && g < b - 10) {
+        coverageMap[i >> 2] = 1;
+        totalStPx++;
+      }
+    }
+
+    /* cursore macchinetta su desktop */
+    if (!isMobile) {
+      const curImg = new Image();
+      curImg.onload = function () {
+        const cc = document.createElement('canvas');
+        cc.width = cc.height = 48;
+        cc.getContext('2d').drawImage(curImg, 0, 0, 48, 48);
+        canvas.style.cursor = 'url(' + cc.toDataURL() + ') 2 46, crosshair';
+      };
+      curImg.src = 'cursore-macchinetta.png';
+    }
+  };
+  stencilImg.src = 'stencil-ester-egg.jpg';
+
+  /* ── audio ── */
+  machineAudio = new Audio('suono-macchinetta.mp3');
+  machineAudio.loop = true;
+
+  function startSound() { if (machineAudio) { machineAudio.currentTime = 0; machineAudio.play().catch(function(){}); } }
+  function stopSound()  { if (machineAudio) { machineAudio.pause(); machineAudio.currentTime = 0; } }
+
+  /* ── start al primo tocco ── */
+  function beginGame() {
+    if (started) return;
+    started = true;
+    startEl.classList.add('hide');
+    startSound();
+  }
+
+  /* ── helper coordinate ── */
+  function ptFromMouse(e) {
+    const r = canvas.getBoundingClientRect(), s = canvasW / r.width;
+    return { x: (e.clientX - r.left) * s, y: (e.clientY - r.top) * s };
+  }
+  function ptFromTouch(e) {
+    const r = canvas.getBoundingClientRect(), s = canvasW / r.width;
+    const t = e.touches[0] || e.changedTouches[0];
+    return { x: (t.clientX - r.left) * s, y: (t.clientY - r.top) * s };
+  }
+
+  /* ── logica principale ── */
+  function process(pt) {
+    if (!coverageMap || wonAlready) return;
+
+    totalSamples++;
+
+    /* controlla se il centro è su una linea viola (raggio 4px) */
+    const cr = 4, cr2 = cr * cr;
+    let onLine = false;
+    const px0 = Math.max(0, Math.floor(pt.x) - cr);
+    const px1 = Math.min(canvasW - 1, Math.ceil(pt.x) + cr);
+    const py0 = Math.max(0, Math.floor(pt.y) - cr);
+    const py1 = Math.min(canvasH - 1, Math.ceil(pt.y) + cr);
+
+    for (let py = py0; py <= py1 && !onLine; py++) {
+      for (let px = px0; px <= px1 && !onLine; px++) {
+        const dx = px - pt.x, dy = py - pt.y;
+        if (dx*dx + dy*dy <= cr2 && coverageMap[py * canvasW + px]) {
+          onLine = true;
+        }
+      }
+    }
+
+    if (!onLine) {
+      offSamples++;
+    } else {
+      /* segna come visitati i pixel viola vicini */
+      for (let py = py0; py <= py1; py++) {
+        for (let px = px0; px <= px1; px++) {
+          const dx = px - pt.x, dy = py - pt.y;
+          if (dx*dx + dy*dy <= cr2) {
+            const idx = py * canvasW + px;
+            if (coverageMap[idx] && !visitedMap[idx]) {
+              visitedMap[idx] = 1;
+              visitedPx++;
+            }
+          }
+        }
+      }
+    }
+
+    /* disegna linea sottile */
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = onLine ? 'rgba(8,4,20,0.75)' : 'rgba(180,40,40,0.5)';
+    ctx.lineWidth   = Math.max(2, canvasW * 0.004);   /* linea sottile */
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    if (lastPt) {
+      ctx.beginPath();
+      ctx.moveTo(lastPt.x, lastPt.y);
+      ctx.lineTo(pt.x, pt.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    lastPt = pt;
+    updateScore();
+
+    /* vittoria: percorso completato (≥82% pixel viola visitati) */
+    if (visitedPx / Math.max(1, totalStPx) >= 0.82) {
+      wonAlready = true;
+      stopSound();
+      setTimeout(showWin, 600);
+    }
+  }
+
+  function updateScore() {
+    if (!totalSamples) return;
+    const pct = Math.max(0, Math.round(100 - (offSamples / totalSamples * 100)));
+    pctEl.textContent = pct + '%';
+    fillEl.style.width = pct + '%';
+    /* cambia colore barra in base alla precisione */
+    if (pct >= 70)      fillEl.style.background = 'var(--accent)';
+    else if (pct >= 40) fillEl.style.background = '#c9824e';
+    else                fillEl.style.background = '#b04040';
+  }
+
+  function showWin() {
+    const pct = Math.max(0, Math.round(100 - (offSamples / Math.max(1, totalSamples) * 100)));
+    winScore.textContent = pct + '%';
+    winEl.classList.add('show');
+  }
+
+  /* ── eventi mouse (hover, nessun click necessario) ── */
+  canvas.addEventListener('mouseenter', function(e) {
+    beginGame();
+    lastPt = ptFromMouse(e);
+  });
+  canvas.addEventListener('mousemove', function(e) {
+    if (!started) return;
+    process(ptFromMouse(e));
+  });
+  canvas.addEventListener('mouseleave', function() {
+    lastPt = null;
+  });
+
+  /* ── eventi touch ── */
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    beginGame();
+    lastPt = ptFromTouch(e);
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if (!started) return;
+    process(ptFromTouch(e));
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', function() {
+    lastPt = null;
+  });
+
+  /* ── start tap overlay ── */
+  startEl.addEventListener('click', function() { beginGame(); });
+  startEl.addEventListener('touchstart', function(e) {
+    e.preventDefault(); beginGame();
+  }, { passive: false });
+
+})();
+
+function goBack() {
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>
