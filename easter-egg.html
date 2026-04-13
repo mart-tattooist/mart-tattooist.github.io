@@ -185,7 +185,7 @@
 <div id="egg-shell">
   <div class="egg-hd">
     <div class="egg-ttl">Hai sbloccato un easter egg!</div>
-    <div class="egg-sub">Segui le linee viola dello stencil dal principio alla fine.<br>Ogni deviazione riduce la precisione.</div>
+    <div class="egg-sub">Tieni premuto e segui le linee viola dello stencil.<br>Ogni deviazione riduce la precisione finale.</div>
   </div>
 
   <div class="canvas-wrap">
@@ -223,7 +223,6 @@
 
   const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
-  /* ── canvas setup ── */
   const canvas   = document.getElementById('egg-cv');
   const startEl  = document.getElementById('egg-start');
   const pctEl    = document.getElementById('egg-pct');
@@ -242,15 +241,15 @@
   canvas.height = canvasH;
   const ctx = canvas.getContext('2d');
 
-  /* ── stato gioco ── */
   let started      = false;
+  let isDown       = false;    /* tasto/dito premuto */
   let wonAlready   = false;
-  let coverageMap  = null;   // 1 = pixel viola stencil
-  let visitedMap   = null;   // 1 = percorso viola già toccato
+  let coverageMap  = null;
+  let visitedMap   = null;
   let totalStPx    = 0;
-  let visitedPx    = 0;
-  let totalSamples = 0;      // ogni evento move = 1 sample
-  let offSamples   = 0;      // samples in cui il centro era fuori linea
+  let visitedPx    = 0;        /* pixel viola toccati → % che sale */
+  let totalSamples = 0;        /* campioni totali mentre isDown */
+  let offSamples   = 0;        /* campioni fuori linea */
   let lastPt       = null;
   let machineAudio = null;
 
@@ -267,11 +266,8 @@
   stencilImg.onload = function () {
     const { sx, sy, sw, sh } = coverCrop(
       stencilImg.naturalWidth, stencilImg.naturalHeight, canvasW, canvasH);
-
-    /* disegna stencil sul canvas */
     ctx.drawImage(stencilImg, sx, sy, sw, sh, 0, 0, canvasW, canvasH);
 
-    /* ghost per rilevare pixel viola */
     const ghost = document.createElement('canvas');
     ghost.width = canvasW; ghost.height = canvasH;
     const gCtx = ghost.getContext('2d');
@@ -282,7 +278,6 @@
     visitedMap  = new Uint8Array(canvasW * canvasH);
     totalStPx   = 0;
 
-    /* rileva linee viola: R e B dominanti, G basso */
     for (let i = 0; i < imgD.data.length; i += 4) {
       const r = imgD.data[i], g = imgD.data[i+1],
             b = imgD.data[i+2], a = imgD.data[i+3];
@@ -292,7 +287,6 @@
       }
     }
 
-    /* cursore macchinetta su desktop */
     if (!isMobile) {
       const curImg = new Image();
       curImg.onload = function () {
@@ -306,22 +300,17 @@
   };
   stencilImg.src = 'stencil-ester-egg.jpg';
 
-  /* ── audio ── */
   machineAudio = new Audio('suono-macchinetta.mp3');
   machineAudio.loop = true;
-
   function startSound() { if (machineAudio) { machineAudio.currentTime = 0; machineAudio.play().catch(function(){}); } }
   function stopSound()  { if (machineAudio) { machineAudio.pause(); machineAudio.currentTime = 0; } }
 
-  /* ── start al primo tocco ── */
   function beginGame() {
     if (started) return;
     started = true;
     startEl.classList.add('hide');
-    startSound();
   }
 
-  /* ── helper coordinate ── */
   function ptFromMouse(e) {
     const r = canvas.getBoundingClientRect(), s = canvasW / r.width;
     return { x: (e.clientX - r.left) * s, y: (e.clientY - r.top) * s };
@@ -332,13 +321,12 @@
     return { x: (t.clientX - r.left) * s, y: (t.clientY - r.top) * s };
   }
 
-  /* ── logica principale ── */
   function process(pt) {
-    if (!coverageMap || wonAlready) return;
+    if (!coverageMap || wonAlready || !isDown) return;
 
     totalSamples++;
 
-    /* controlla se il centro è su una linea viola (raggio 4px) */
+    /* rileva se il centro è sulla linea viola (raggio 4px) */
     const cr = 4, cr2 = cr * cr;
     let onLine = false;
     const px0 = Math.max(0, Math.floor(pt.x) - cr);
@@ -349,16 +337,15 @@
     for (let py = py0; py <= py1 && !onLine; py++) {
       for (let px = px0; px <= px1 && !onLine; px++) {
         const dx = px - pt.x, dy = py - pt.y;
-        if (dx*dx + dy*dy <= cr2 && coverageMap[py * canvasW + px]) {
-          onLine = true;
-        }
+        if (dx*dx + dy*dy <= cr2 && coverageMap[py * canvasW + px]) onLine = true;
       }
     }
 
     if (!onLine) {
+      /* fuori linea: penalità al punteggio finale, % display si ferma */
       offSamples++;
     } else {
-      /* segna come visitati i pixel viola vicini */
+      /* sulla linea: segna pixel visitati → % sale */
       for (let py = py0; py <= py1; py++) {
         for (let px = px0; px <= px1; px++) {
           const dx = px - pt.x, dy = py - pt.y;
@@ -373,11 +360,11 @@
       }
     }
 
-    /* disegna linea sottile */
+    /* linea sempre nera */
     ctx.save();
     ctx.globalCompositeOperation = 'source-over';
-    ctx.strokeStyle = onLine ? 'rgba(8,4,20,0.75)' : 'rgba(180,40,40,0.5)';
-    ctx.lineWidth   = Math.max(2, canvasW * 0.004);   /* linea sottile */
+    ctx.strokeStyle = 'rgba(8,4,20,0.80)';
+    ctx.lineWidth   = Math.max(2, canvasW * 0.004);
     ctx.lineCap     = 'round';
     ctx.lineJoin    = 'round';
     if (lastPt) {
@@ -389,68 +376,107 @@
     ctx.restore();
 
     lastPt = pt;
-    updateScore();
+    updateDisplay();
 
-    /* vittoria: percorso completato (≥82% pixel viola visitati) */
+    /* vittoria: 82% del tracciato percorso */
     if (visitedPx / Math.max(1, totalStPx) >= 0.82) {
       wonAlready = true;
       stopSound();
-      setTimeout(showWin, 600);
+      setTimeout(showResult, 600);
     }
   }
 
-  function updateScore() {
-    if (!totalSamples) return;
-    const pct = Math.max(0, Math.round(100 - (offSamples / totalSamples * 100)));
+  function updateDisplay() {
+    /* % mostrata = copertura del tracciato (sale, non scende mai) */
+    const pct = Math.min(100, Math.round(visitedPx / Math.max(1, totalStPx) * 100));
     pctEl.textContent = pct + '%';
     fillEl.style.width = pct + '%';
-    /* cambia colore barra in base alla precisione */
-    if (pct >= 70)      fillEl.style.background = 'var(--accent)';
-    else if (pct >= 40) fillEl.style.background = '#c9824e';
-    else                fillEl.style.background = '#b04040';
   }
 
-  function showWin() {
-    const pct = Math.max(0, Math.round(100 - (offSamples / Math.max(1, totalSamples) * 100)));
-    winScore.textContent = pct + '%';
-    winEl.classList.add('show');
+  function finalPrecision() {
+    return Math.max(0, Math.round(100 - (offSamples / Math.max(1, totalSamples) * 100)));
   }
 
-  /* ── eventi mouse (hover, nessun click necessario) ── */
-  canvas.addEventListener('mouseenter', function(e) {
+  function showResult() {
+    const prec = finalPrecision();
+    if (prec >= 95) {
+      /* vittoria */
+      winScore.textContent = prec + '%';
+      winEl.classList.add('show');
+    } else {
+      /* game over */
+      showGameOver(prec);
+    }
+  }
+
+  function showGameOver(prec) {
+    const go = document.createElement('div');
+    go.id = 'egg-gameover';
+    go.innerHTML =
+      '<div class="egg-win-inner">' +
+        '<h2 class="egg-win-h" style="color:#b04040">Game Over</h2>' +
+        '<div class="egg-win-score" style="color:#b04040">' + prec + '%</div>' +
+        '<div class="egg-win-score-label">Precisione finale</div>' +
+        '<p class="egg-win-p">Troppi errori! Segui le linee viola con più precisione.<br>Riprova — puoi farcela.</p>' +
+        '<button id="egg-retry-btn">Riprova</button>' +
+        '<button id="egg-go-back-btn">Esci</button>' +
+      '</div>';
+    go.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;padding:2rem;animation:fadeIn .5s ease;';
+    document.body.appendChild(go);
+    document.getElementById('egg-retry-btn').addEventListener('click', function() {
+      window.location.reload();
+    });
+    document.getElementById('egg-go-back-btn').addEventListener('click', function() {
+      window.location.href = 'index.html';
+    });
+  }
+
+  /* ── eventi mouse (click + drag) ── */
+  canvas.addEventListener('mousedown', function(e) {
     beginGame();
+    isDown = true;
     lastPt = ptFromMouse(e);
+    startSound();
+    e.preventDefault();
   });
   canvas.addEventListener('mousemove', function(e) {
-    if (!started) return;
+    if (!started || !isDown) return;
     process(ptFromMouse(e));
   });
+  canvas.addEventListener('mouseup', function() {
+    isDown = false; lastPt = null; stopSound();
+  });
   canvas.addEventListener('mouseleave', function() {
-    lastPt = null;
+    isDown = false; lastPt = null; stopSound();
   });
 
   /* ── eventi touch ── */
   canvas.addEventListener('touchstart', function(e) {
     e.preventDefault();
     beginGame();
+    isDown = true;
     lastPt = ptFromTouch(e);
+    startSound();
   }, { passive: false });
-
   canvas.addEventListener('touchmove', function(e) {
     e.preventDefault();
     if (!started) return;
     process(ptFromTouch(e));
   }, { passive: false });
-
   canvas.addEventListener('touchend', function() {
-    lastPt = null;
+    isDown = false; lastPt = null; stopSound();
   });
 
-  /* ── start tap overlay ── */
-  startEl.addEventListener('click', function() { beginGame(); });
-  startEl.addEventListener('touchstart', function(e) {
-    e.preventDefault(); beginGame();
-  }, { passive: false });
+  /* stile bottoni game over */
+  const s = document.createElement('style');
+  s.textContent =
+    '#egg-retry-btn,#egg-go-back-btn{margin-top:.2rem;background:none;border:1px solid #444;color:#888;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;padding:.55rem 1.6rem;cursor:pointer;border-radius:2px;transition:all .2s;font-family:var(--font);}' +
+    '#egg-retry-btn:hover{border-color:var(--accent);color:var(--text);}' +
+    '#egg-go-back-btn:hover{border-color:#b04040;color:var(--text);}';
+  document.head.appendChild(s);
+
+  /* start overlay */
+  startEl.addEventListener('click', function() { /* click sull'overlay non inizia, aspetta mousedown su canvas */ });
 
 })();
 
