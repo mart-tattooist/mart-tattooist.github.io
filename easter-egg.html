@@ -460,7 +460,7 @@
   }, { passive: false });
   canvas.addEventListener('touchmove', function(e) {
     e.preventDefault();
-    if (!started) return;
+    if (!started || !isDown) return;
     process(ptFromTouch(e));
   }, { passive: false });
   canvas.addEventListener('touchend', function() {
@@ -475,8 +475,14 @@
     '#egg-go-back-btn:hover{border-color:#b04040;color:var(--text);}';
   document.head.appendChild(s);
 
-  /* start overlay */
-  startEl.addEventListener('click', function() { /* click sull'overlay non inizia, aspetta mousedown su canvas */ });
+  /* overlay start — sparisce al primo tocco/click sul canvas o sull'overlay stesso */
+  startEl.addEventListener('mousedown', function(e) {
+    startEl.classList.add('hide');
+  });
+  startEl.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    startEl.classList.add('hide');
+  }, { passive: false });
 
 })();
 
