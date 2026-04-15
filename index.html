@@ -1165,7 +1165,11 @@
 <section class="page" id="page-flash">
   <div class="page-header">
     <h1>Flash disponibili</h1>
-    <p><span class="link-hidden" onclick="showPage('about')">Contattami per prenotare</span></p>
+    <p>
+      <a href="https://wa.me/391234567890?text=Ciao!%20Vorrei%20prenotare%20un%20flash" class="link-hidden" target="_blank">
+        Contattami per prenotare
+      </a>
+    </p>
   </div>
 
   <!--
@@ -1914,7 +1918,7 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
       '0 0 0 ' + (clickCount * 3) + 'px rgba(201,169,110,' + (glow * 0.45) + ')';
     if (clickCount >= 10) {
       photoWrap.removeEventListener('click', onPhotoClick);
-      setTimeout(function() { window.location.href = 'easter-egg.html'; }, 350);
+      setTimeout(spawnEgg, 350);
     }
   }
 
