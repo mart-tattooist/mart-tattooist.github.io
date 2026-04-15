@@ -155,26 +155,6 @@
     }
     #egg-win-btn:hover { border-color: var(--accent); color: var(--text); }
 
-    /* ── schermata start ── */
-    #egg-start {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.55);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: opacity 0.3s;
-      z-index: 5;
-    }
-    #egg-start.hide { opacity: 0; pointer-events: none; }
-    .egg-start-label {
-      font-size: 0.78rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text);
-      border: 1px solid rgba(255,255,255,0.3);
-      padding: 0.7rem 1.6rem; border-radius: 2px;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(4px);
-    }
-
     .canvas-wrap { position: relative; }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -190,16 +170,9 @@
 
   <div class="canvas-wrap">
     <canvas id="egg-cv"></canvas>
-    <div id="egg-start"><span class="egg-start-label">Tocca per iniziare</span></div>
   </div>
 
-  <div class="egg-pw">
-    <div class="egg-pl">
-      <span>Precisione</span>
-      <span id="egg-pct">100%</span>
-    </div>
-    <div class="egg-pt"><div id="egg-pf"></div></div>
-  </div>
+
 </div>
 
 <button id="egg-x" onclick="goBack()">×</button>
@@ -224,9 +197,6 @@
   const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
   const canvas   = document.getElementById('egg-cv');
-  const startEl  = document.getElementById('egg-start');
-  const pctEl    = document.getElementById('egg-pct');
-  const fillEl   = document.getElementById('egg-pf');
   const winEl    = document.getElementById('egg-win');
   const winScore = document.getElementById('win-score');
 
@@ -241,8 +211,7 @@
   canvas.height = canvasH;
   const ctx = canvas.getContext('2d');
 
-  let started      = false;
-  let isDown       = false;    /* tasto/dito premuto */
+  let isDown       = false;
   let wonAlready   = false;
   let coverageMap  = null;
   let visitedMap   = null;
@@ -304,12 +273,6 @@
   machineAudio.loop = true;
   function startSound() { if (machineAudio) { machineAudio.currentTime = 0; machineAudio.play().catch(function(){}); } }
   function stopSound()  { if (machineAudio) { machineAudio.pause(); machineAudio.currentTime = 0; } }
-
-  function beginGame() {
-    if (started) return;
-    started = true;
-    startEl.classList.add('hide');
-  }
 
   function ptFromMouse(e) {
     const r = canvas.getBoundingClientRect(), s = canvasW / r.width;
@@ -376,21 +339,13 @@
     ctx.restore();
 
     lastPt = pt;
-    updateDisplay();
 
-    /* vittoria: 82% del tracciato percorso */
-    if (visitedPx / Math.max(1, totalStPx) >= 0.82) {
+    /* vittoria: 100% del tracciato percorso */
+    if (visitedPx / Math.max(1, totalStPx) >= 1.0) {
       wonAlready = true;
       stopSound();
       setTimeout(showResult, 600);
     }
-  }
-
-  function updateDisplay() {
-    /* % mostrata = copertura del tracciato (sale, non scende mai) */
-    const pct = Math.min(100, Math.round(visitedPx / Math.max(1, totalStPx) * 100));
-    pctEl.textContent = pct + '%';
-    fillEl.style.width = pct + '%';
   }
 
   function finalPrecision() {
@@ -433,14 +388,13 @@
 
   /* ── eventi mouse (click + drag) ── */
   canvas.addEventListener('mousedown', function(e) {
-    beginGame();
     isDown = true;
     lastPt = ptFromMouse(e);
     startSound();
     e.preventDefault();
   });
   canvas.addEventListener('mousemove', function(e) {
-    if (!started || !isDown) return;
+    if (!isDown) return;
     process(ptFromMouse(e));
   });
   canvas.addEventListener('mouseup', function() {
@@ -453,14 +407,13 @@
   /* ── eventi touch ── */
   canvas.addEventListener('touchstart', function(e) {
     e.preventDefault();
-    beginGame();
     isDown = true;
     lastPt = ptFromTouch(e);
     startSound();
   }, { passive: false });
   canvas.addEventListener('touchmove', function(e) {
     e.preventDefault();
-    if (!started || !isDown) return;
+    if (!isDown) return;
     process(ptFromTouch(e));
   }, { passive: false });
   canvas.addEventListener('touchend', function() {
@@ -474,15 +427,6 @@
     '#egg-retry-btn:hover{border-color:var(--accent);color:var(--text);}' +
     '#egg-go-back-btn:hover{border-color:#b04040;color:var(--text);}';
   document.head.appendChild(s);
-
-  /* overlay start — sparisce al primo tocco/click sul canvas o sull'overlay stesso */
-  startEl.addEventListener('mousedown', function(e) {
-    startEl.classList.add('hide');
-  });
-  startEl.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    startEl.classList.add('hide');
-  }, { passive: false });
 
 })();
 
