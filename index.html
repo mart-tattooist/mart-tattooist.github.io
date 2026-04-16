@@ -963,61 +963,12 @@
     @keyframes splashLogoIn {
       to { opacity: 1; transform: scale(1); }
     }
-
-    /* ──────── BACK TO TOP ──────── */
-    #back-to-top {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(136,136,136,0.45);
-      background: rgba(15,15,15,0.55);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 500;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(10px);
-      transition: opacity 0.28s ease, transform 0.28s ease;
-    }
-    #back-to-top.visible {
-      opacity: 1;
-      pointer-events: all;
-      transform: translateY(0);
-    }
-    #back-to-top:hover {
-      border-color: rgba(136,136,136,0.8);
-      background: rgba(15,15,15,0.75);
-    }
-    #back-to-top svg {
-      width: 16px;
-      height: 16px;
-      stroke: var(--muted);
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    @media (max-width: 768px) {
-      #back-to-top { bottom: 1.4rem; right: 1.2rem; width: 40px; height: 40px; }
-    }
   </style>
 </head>
 <body>
 
 <!-- ═══════════ SPLASH SCREEN ═══════════ -->
 <div id="splash">
-
-<!-- ── Back to top ── -->
-<button id="back-to-top" aria-label="Torna in cima" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-</button>
   <img src="logo.png" alt="MART"
        onerror="this.style.display='none'; document.getElementById('splash-fallback').style.display='block'">
   <span id="splash-fallback" class="splash-fallback" style="display:none">MART</span>
@@ -2338,39 +2289,6 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
   }
 })();
 
-
-/* ──────── BACK TO TOP ──────── */
-(function () {
-  const btn = document.getElementById('back-to-top');
-  const pages = ['page-lavori', 'page-flash', 'page-video'];
-
-  function onScroll () {
-    const activePage = document.querySelector('.page.visible');
-    if (!activePage || !pages.includes(activePage.id)) {
-      btn.classList.remove('visible');
-      return;
-    }
-    /* mostra quando la prima riga di foto esce dalla viewport */
-    const grid = activePage.querySelector('.insta-grid');
-    if (!grid) return;
-    const firstItem = grid.querySelector('.grid-item, .flash-wrap');
-    if (!firstItem) return;
-    const threshold = firstItem.getBoundingClientRect().bottom;
-    if (threshold < 0) {
-      btn.classList.add('visible');
-    } else {
-      btn.classList.remove('visible');
-    }
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  /* ri-controlla anche al cambio pagina */
-  document.querySelectorAll('.nav-links button').forEach(function(b) {
-    b.addEventListener('click', function() {
-      setTimeout(onScroll, 50);
-    });
-  });
-})();
 
 document.addEventListener('wheel', e => {
   if (e.ctrlKey) e.preventDefault();
