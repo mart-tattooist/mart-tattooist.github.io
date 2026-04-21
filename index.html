@@ -1570,6 +1570,18 @@ function showPage(name, addHistory = true) {
   if (targetPage) targetPage.classList.add('visible');
   if (targetBtn)  targetBtn.classList.add('active');
 
+  /* ── Fade-in foto artista (pagina Contatti) ──
+     Ogni volta che si apre la pagina, resetta opacity a 0 e
+     riattiva la transizione CSS da capo, come nelle altre pagine. */
+  if (name === 'about') {
+    const artistImg = document.querySelector('#page-about .artist-photo img');
+    if (artistImg) {
+      artistImg.classList.remove('loaded');
+      void artistImg.offsetWidth;           /* forza reflow */
+      setTimeout(function () { artistImg.classList.add('loaded'); }, 60);
+    }
+  }
+
   window.scrollTo({ top: 0 });
   if (addHistory) history.pushState({ page: name }, '');
 }
