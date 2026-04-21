@@ -963,6 +963,54 @@
     @keyframes splashLogoIn {
       to { opacity: 1; transform: scale(1); }
     }
+
+    /* ──────── BACK TO TOP ──────── */
+    #back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 999;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid rgba(136,136,136,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, border-color 0.22s, background 0.22s;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    #back-to-top.btt-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #back-to-top:hover {
+      border-color: rgba(136,136,136,0.85);
+      background: rgba(136,136,136,0.08);
+    }
+    #back-to-top svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+    }
+    @media (max-width: 768px) {
+      #back-to-top {
+        bottom: 1.4rem;
+        right: 1.2rem;
+        width: 40px;
+        height: 40px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1493,6 +1541,13 @@
   </footer>
 </section>
 
+
+<!-- ═══════════ BACK TO TOP ═══════════ -->
+<button id="back-to-top" aria-label="Torna in cima" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 24 24">
+    <polyline points="4 15 12 7 20 15"/>
+  </svg>
+</button>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ── VARIABILI GLOBALI ── */
@@ -2335,6 +2390,45 @@ document.addEventListener('gestureend',    e => e.preventDefault(), { passive: f
   // Controlliamo anche quando si apre il Lightbox (le foto grandi)
   const observer = new MutationObserver(attivaEffettoFade);
   observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
+<script>
+/* ──────── BACK TO TOP ──────── */
+(function () {
+  var btn = document.getElementById('back-to-top');
+  var SCROLL_PAGES = ['page-lavori', 'page-flash', 'page-video'];
+  var NAV_H = 64;
+
+  function updateBtt() {
+    if (!btn) return;
+    var activePage = document.querySelector('.page.visible');
+    if (!activePage || SCROLL_PAGES.indexOf(activePage.id) === -1) {
+      btn.classList.remove('btt-visible');
+      return;
+    }
+    var firstItem = activePage.querySelector('.grid-item');
+    if (!firstItem) { btn.classList.remove('btt-visible'); return; }
+
+    /* Mostra quando il fondo della prima riga è risalito sopra la navbar */
+    var rect = firstItem.getBoundingClientRect();
+    if (rect.bottom < NAV_H) {
+      btn.classList.add('btt-visible');
+    } else {
+      btn.classList.remove('btt-visible');
+    }
+  }
+
+  window.addEventListener('scroll', updateBtt, { passive: true });
+
+  /* Nascondi subito al cambio pagina (showPage chiama scrollTo top) */
+  var _origShowPage = window.showPage;
+  if (typeof _origShowPage === 'function') {
+    window.showPage = function () {
+      btn && btn.classList.remove('btt-visible');
+      _origShowPage.apply(this, arguments);
+    };
+  }
+})();
 </script>
 </body>
 </html>
