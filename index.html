@@ -1570,17 +1570,8 @@ function showPage(name, addHistory = true) {
   if (targetPage) targetPage.classList.add('visible');
   if (targetBtn)  targetBtn.classList.add('active');
 
-  /* ── Fade-in foto artista (pagina Contatti) ──
-     Ogni volta che si apre la pagina, resetta opacity a 0 e
-     riattiva la transizione CSS da capo, come nelle altre pagine. */
-  if (name === 'about') {
-    const artistImg = document.querySelector('#page-about .artist-photo img');
-    if (artistImg) {
-      artistImg.classList.remove('loaded');
-      void artistImg.offsetWidth;           /* forza reflow */
-      setTimeout(function () { artistImg.classList.add('loaded'); }, 60);
-    }
-  }
+  /* Fade-in simultaneo di tutte le immagini della pagina appena aperta */
+  if (targetPage) fadeInPageImages(targetPage);
 
   window.scrollTo({ top: 0 });
   if (addHistory) history.pushState({ page: name }, '');
@@ -2366,41 +2357,69 @@ document.addEventListener('gestureend',    e => e.preventDefault(), { passive: f
 
 </script>
 <script>
-  function attivaEffettoFade() {
-    // Cerchiamo tutte le immagini che non sono ancora state "attivate"
-    var immagini = document.querySelectorAll('img:not(#splash img):not(.loaded)');
-    
-    immagini.forEach(function(img) {
-      // Se l'immagine è già pronta o è piccolissima (già in memoria)
+  /* ── FADE-IN SIMULTANEO: tutte le immagini di una pagina appaiono insieme ──
+     Raccoglie tutte le img della pagina, aspetta che siano tutte pronte,
+     poi aggiunge 'loaded' a tutte in una volta sola → stesso identico fade. */
+  function fadeInPageImages(pageEl) {
+    if (!pageEl) return;
+
+    var imgs = Array.from(pageEl.querySelectorAll('img')).filter(function(img) {
+      return !img.closest('#splash');
+    });
+    if (!imgs.length) return;
+
+    /* Resetta tutte le immagini della pagina (opacity → 0) */
+    imgs.forEach(function(img) { img.classList.remove('loaded'); });
+
+    /* Forza il browser a registrare il reset prima di avviare la transizione */
+    void pageEl.offsetWidth;
+
+    var total = imgs.length;
+    var done  = 0;
+
+    function onSettled() {
+      done++;
+      if (done >= total) {
+        /* Tutte pronte → fade-in simultaneo con la stessa transizione CSS */
+        imgs.forEach(function(img) { img.classList.add('loaded'); });
+      }
+    }
+
+    imgs.forEach(function(img) {
       if (img.complete && img.naturalWidth > 0) {
-        img.classList.add('loaded');
+        onSettled();
       } else {
-        // Altrimenti aspettiamo che finisca di caricare
-        img.addEventListener('load', function() {
-          img.classList.add('loaded');
-        });
-        // Se c'è un errore di caricamento, la mostriamo comunque invece di lasciarla nera
-        img.addEventListener('error', function() {
-          img.classList.add('loaded');
-        });
+        img.addEventListener('load',  onSettled, { once: true });
+        img.addEventListener('error', onSettled, { once: true });
       }
     });
   }
 
-  // Eseguiamo il controllo subito
-  attivaEffettoFade();
+  /* Rende fadeInPageImages accessibile da showPage (definita in un altro script) */
+  window.fadeInPageImages = fadeInPageImages;
 
-  // IMPORTANTE: Eseguiamo il controllo anche ogni volta che l'utente clicca sui menu
-  // così le foto nelle altre pagine appaiono correttamente
-  document.querySelectorAll('.nav-links button').forEach(btn => {
-    btn.addEventListener('click', function() {
-      // Aspettiamo un attimo che la pagina cambi e poi attiviamo il fade
-      setTimeout(attivaEffettoFade, 100);
+  /* Prima apertura: la pagina Tatuaggi è già visible nel markup */
+  fadeInPageImages(document.querySelector('.page.visible'));
+
+  /* Immagini aggiunte dinamicamente (lightbox) — fade individuale come prima */
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.addedNodes.forEach(function(node) {
+        if (node.nodeType !== 1) return;
+        var newImgs = (node.tagName === 'IMG') ? [node]
+                    : Array.from(node.querySelectorAll ? node.querySelectorAll('img') : []);
+        newImgs.forEach(function(img) {
+          if (img.closest && img.closest('#splash')) return;
+          if (img.complete && img.naturalWidth > 0) {
+            img.classList.add('loaded');
+          } else {
+            img.addEventListener('load',  function() { img.classList.add('loaded'); }, { once: true });
+            img.addEventListener('error', function() { img.classList.add('loaded'); }, { once: true });
+          }
+        });
+      });
     });
   });
-
-  // Controlliamo anche quando si apre il Lightbox (le foto grandi)
-  const observer = new MutationObserver(attivaEffettoFade);
   observer.observe(document.body, { childList: true, subtree: true });
 </script>
 
