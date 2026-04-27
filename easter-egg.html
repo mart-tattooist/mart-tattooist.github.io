@@ -13,6 +13,8 @@
       --text:    #f0ece8;
       --muted:   #888;
       --accent:  #c9a96e;
+      --success: #5a9e6f;
+      --danger:  #b04040;
       --font:    'DM Sans', sans-serif;
     }
 
@@ -68,7 +70,7 @@
       cursor: crosshair;
     }
 
-    /* ── barra punteggio ── */
+    /* ── barra progresso (solo avanzamento, NO precisione) ── */
     .egg-pw {
       width: 100%;
       max-width: 480px;
@@ -92,10 +94,10 @@
     }
     #egg-pf {
       height: 100%;
-      width: 100%;           /* inizia a 100% */
+      width: 0%;              /* parte da 0, avanza col tracciato */
       background: var(--accent);
       border-radius: 2px;
-      transition: width 0.2s, background 0.4s;
+      transition: width 0.2s;
     }
 
     /* ── tasto chiudi ── */
@@ -110,7 +112,7 @@
     }
     #egg-x:hover { color: var(--text); }
 
-    /* ── schermata vittoria ── */
+    /* ── schermata risultato (vittoria / sconfitta) ── */
     #egg-win {
       display: none;
       position: fixed; inset: 0; z-index: 999;
@@ -120,23 +122,46 @@
       animation: fadeIn .5s ease;
     }
     #egg-win.show { display: flex; }
+
     .egg-win-inner {
       text-align: center;
       max-width: 380px;
       display: flex; flex-direction: column;
       align-items: center; gap: 0.85rem;
     }
+
     .egg-win-h  { font-size: 1.9rem; font-weight: 300; color: var(--accent); }
+    .egg-win-h.fail { color: var(--danger); }
+
     .egg-win-p  { font-size: 0.9rem; color: var(--text); line-height: 1.7; }
+
+    /* Blocco precisione finale */
     .egg-win-score {
       font-size: 3rem; font-weight: 500;
       letter-spacing: 0.1em; color: var(--accent);
     }
+    .egg-win-score.fail { color: var(--danger); }
     .egg-win-score-label {
       font-size: 0.68rem; letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--muted);
       margin-top: -0.4rem;
     }
+
+    /* Etichetta SUCCESSO / FALLIMENTO */
+    .egg-win-verdict {
+      font-size: 0.78rem; letter-spacing: 0.26em;
+      text-transform: uppercase; font-weight: 500;
+      padding: 0.4rem 1.2rem; border-radius: 2px;
+    }
+    .egg-win-verdict.success {
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+    .egg-win-verdict.fail {
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
     .egg-win-code {
       font-size: 1.8rem; font-weight: 500;
       letter-spacing: 0.28em; color: var(--accent);
@@ -145,15 +170,43 @@
     }
     .egg-win-hint { font-size: .73rem; color: var(--muted); letter-spacing: .05em; }
     .egg-win-hint strong { color: var(--text); }
-    #egg-win-btn {
-      margin-top: .3rem; background: none;
+
+    .egg-win-actions {
+      display: flex; gap: 0.8rem;
+      flex-wrap: wrap; justify-content: center;
+      margin-top: .2rem;
+    }
+    .egg-btn {
+      background: none;
       border: 1px solid #444; color: #888;
       font-size: .76rem; letter-spacing: .14em;
       text-transform: uppercase; padding: .55rem 1.6rem;
       cursor: pointer; border-radius: 2px;
       transition: all .2s; font-family: var(--font);
     }
-    #egg-win-btn:hover { border-color: var(--accent); color: var(--text); }
+    .egg-btn:hover          { border-color: var(--accent); color: var(--text); }
+    .egg-btn.danger:hover   { border-color: var(--danger);  color: var(--text); }
+    .egg-btn.success:hover  { border-color: var(--success); color: var(--text); }
+
+    /* ── schermata start ── */
+    #egg-start {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.55);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      z-index: 5;
+    }
+    #egg-start.hide { opacity: 0; pointer-events: none; }
+    .egg-start-label {
+      font-size: 0.78rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 0.7rem 1.6rem; border-radius: 2px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+    }
 
     .canvas-wrap { position: relative; }
 
@@ -165,28 +218,55 @@
 <div id="egg-shell">
   <div class="egg-hd">
     <div class="egg-ttl">Hai sbloccato un easter egg!</div>
-    <div class="egg-sub">Tieni premuto e segui le linee viola dello stencil.<br>Ogni deviazione riduce la precisione finale.</div>
+    <div class="egg-sub">Tieni premuto e segui le linee viola dello stencil.<br>Ogni deviazione riduce la precisione finale — senza possibilità di recupero.</div>
   </div>
 
   <div class="canvas-wrap">
     <canvas id="egg-cv"></canvas>
+    <div id="egg-start"><span class="egg-start-label">Tocca per iniziare</span></div>
   </div>
 
-
+  <!-- Barra di PROGRESSO (solo avanzamento percorso, precisione nascosta) -->
+  <div class="egg-pw">
+    <div class="egg-pl">
+      <span>Progresso</span>
+      <span id="egg-prog-pct">0%</span>
+    </div>
+    <div class="egg-pt"><div id="egg-pf"></div></div>
+  </div>
 </div>
 
 <button id="egg-x" onclick="goBack()">×</button>
 
-<!-- schermata vittoria -->
+<!-- Schermata riepilogo (vittoria O sconfitta — stessa overlay) -->
 <div id="egg-win">
   <div class="egg-win-inner">
-    <h2 class="egg-win-h">Tatuaggio completato!</h2>
-    <div class="egg-win-score" id="win-score">100%</div>
+    <h2 class="egg-win-h" id="win-title">Tatuaggio completato!</h2>
+    <div class="egg-win-score" id="win-score">—</div>
     <div class="egg-win-score-label">Precisione finale</div>
-    <p class="egg-win-p">Hai terminato lo stencil.<br>Mostra questo codice a MART per ottenere il tuo sconto.</p>
-    <div class="egg-win-code">M4R73</div>
-    <p class="egg-win-hint"><strong>20% di sconto</strong> sul tuo prossimo tatuaggio.</p>
-    <button id="egg-win-btn" onclick="goBack()">Chiudi</button>
+    <div class="egg-win-verdict" id="win-verdict">SUCCESSO</div>
+
+    <!-- Contenuto visibile solo in caso di SUCCESSO -->
+    <div id="win-success-block">
+      <p class="egg-win-p" style="margin-bottom:0.6rem">
+        Ottimo lavoro! Mostra questo codice a MART<br>per ottenere il tuo sconto.
+      </p>
+      <div class="egg-win-code">M4R73</div>
+      <p class="egg-win-hint"><strong>20% di sconto</strong> sul tuo prossimo tatuaggio.</p>
+    </div>
+
+    <!-- Contenuto visibile solo in caso di FALLIMENTO -->
+    <div id="win-fail-block" style="display:none">
+      <p class="egg-win-p">
+        Troppi errori! Segui le linee viola con più cura.<br>
+        La precisione persa non si recupera — riparti da zero.
+      </p>
+    </div>
+
+    <div class="egg-win-actions">
+      <button class="egg-btn" id="egg-retry-btn" style="display:none" onclick="window.location.reload()">Riprova</button>
+      <button class="egg-btn" id="egg-win-btn"   onclick="goBack()">Chiudi</button>
+    </div>
   </div>
 </div>
 
@@ -194,11 +274,26 @@
 (function () {
   'use strict';
 
+  /* ── Configurazione ──────────────────────────────────── */
+  const minAccuracy        = 85;    // soglia minima per il successo (%)
+  const COLLISION_RADIUS   = 10;    // raggio tolleranza sulla linea (px canvas)
+  const POLL_INTERVAL_MS   = 15;    // frequenza campionamento (ms)
+  const PENALTY_PER_POLL   = 0.07;  // % di precisione persa per ogni tick fuori linea
+  /* ──────────────────────────────────────────────────── */
+
   const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
-  const canvas   = document.getElementById('egg-cv');
-  const winEl    = document.getElementById('egg-win');
-  const winScore = document.getElementById('win-score');
+  const canvas      = document.getElementById('egg-cv');
+  const startEl     = document.getElementById('egg-start');
+  const progPctEl   = document.getElementById('egg-prog-pct');
+  const fillEl      = document.getElementById('egg-pf');
+  const winEl       = document.getElementById('egg-win');
+  const winTitle    = document.getElementById('win-title');
+  const winScore    = document.getElementById('win-score');
+  const winVerdict  = document.getElementById('win-verdict');
+  const winSuccessB = document.getElementById('win-success-block');
+  const winFailB    = document.getElementById('win-fail-block');
+  const retryBtn    = document.getElementById('egg-retry-btn');
 
   const dpr   = Math.min(window.devicePixelRatio || 1, 2);
   const maxSz = Math.min(480, window.innerWidth * 0.9, window.innerHeight * 0.58);
@@ -211,18 +306,21 @@
   canvas.height = canvasH;
   const ctx = canvas.getContext('2d');
 
-  let isDown       = false;
-  let wonAlready   = false;
-  let coverageMap  = null;
-  let visitedMap   = null;
-  let totalStPx    = 0;
-  let visitedPx    = 0;        /* pixel viola toccati → % che sale */
-  let totalSamples = 0;        /* campioni totali mentre isDown */
-  let offSamples   = 0;        /* campioni fuori linea */
-  let lastPt       = null;
-  let machineAudio = null;
+  /* ── Stato gioco ── */
+  let started       = false;
+  let isDown        = false;
+  let wonAlready    = false;
+  let coverageMap   = null;
+  let visitedMap    = null;
+  let totalStPx     = 0;
+  let visitedPx     = 0;
+  let lastPt        = null;
+  let currentPt     = null;   // posizione corrente per il polling
+  let precision     = 100;    // decresce, NON si recupera mai
+  let pollingTimer  = null;
+  let machineAudio  = null;
 
-  /* ── carica stencil ── */
+  /* ── Carica stencil ── */
   function coverCrop(iw, ih, dw, dh) {
     const ia = iw / ih, da = dw / dh;
     let sx, sy, sw, sh;
@@ -269,11 +367,20 @@
   };
   stencilImg.src = 'stencil-ester-egg.jpg';
 
+  /* ── Audio ── */
   machineAudio = new Audio('suono-macchinetta.mp3');
   machineAudio.loop = true;
   function startSound() { if (machineAudio) { machineAudio.currentTime = 0; machineAudio.play().catch(function(){}); } }
   function stopSound()  { if (machineAudio) { machineAudio.pause(); machineAudio.currentTime = 0; } }
 
+  /* ── Avvio partita ── */
+  function beginGame() {
+    if (started) return;
+    started = true;
+    startEl.classList.add('hide');
+  }
+
+  /* ── Coordinate ── */
   function ptFromMouse(e) {
     const r = canvas.getBoundingClientRect(), s = canvasW / r.width;
     return { x: (e.clientX - r.left) * s, y: (e.clientY - r.top) * s };
@@ -284,46 +391,81 @@
     return { x: (t.clientX - r.left) * s, y: (t.clientY - r.top) * s };
   }
 
+  /* ────────────────────────────────────────────────────
+     COLLISION DETECTION
+     Restituisce true se il punto pt è entro COLLISION_RADIUS
+     pixel da un pixel della linea viola (coverageMap).
+  ──────────────────────────────────────────────────── */
+  function isOnLine(pt) {
+    if (!coverageMap) return false;
+    const cr = COLLISION_RADIUS * dpr;
+    const cr2 = cr * cr;
+    const px0 = Math.max(0, Math.floor(pt.x) - cr);
+    const px1 = Math.min(canvasW - 1, Math.ceil(pt.x) + cr);
+    const py0 = Math.max(0, Math.floor(pt.y) - cr);
+    const py1 = Math.min(canvasH - 1, Math.ceil(pt.y) + cr);
+    for (let py = py0; py <= py1; py++) {
+      for (let px = px0; px <= px1; px++) {
+        const dx = px - pt.x, dy = py - pt.y;
+        if (dx*dx + dy*dy <= cr2 && coverageMap[py * canvasW + px]) return true;
+      }
+    }
+    return false;
+  }
+
+  /* ────────────────────────────────────────────────────
+     POLLING — campionamento ogni POLL_INTERVAL_MS ms
+     Controlla se il cursore è sulla linea e applica
+     penalità NON RECUPERABILE se è fuori.
+  ──────────────────────────────────────────────────── */
+  function startPolling() {
+    if (pollingTimer) return;
+    pollingTimer = setInterval(function () {
+      if (!started || !isDown || !currentPt || wonAlready || !coverageMap) return;
+
+      if (!isOnLine(currentPt)) {
+        /* PENALITÀ: la precisione scende e non risale mai */
+        precision = Math.max(0, precision - PENALTY_PER_POLL);
+      }
+    }, POLL_INTERVAL_MS);
+  }
+
+  function stopPolling() {
+    if (pollingTimer) { clearInterval(pollingTimer); pollingTimer = null; }
+  }
+
+  /* ────────────────────────────────────────────────────
+     PROCESSO DI DISEGNO
+     Gestisce la traccia visiva e il conteggio pixel visitati.
+     La percentuale di precisione NON viene mostrata qui.
+  ──────────────────────────────────────────────────── */
   function process(pt) {
     if (!coverageMap || wonAlready || !isDown) return;
 
-    totalSamples++;
+    currentPt = pt;
 
-    /* rileva se il centro è sulla linea viola (raggio 4px) */
-    const cr = 4, cr2 = cr * cr;
-    let onLine = false;
+    /* Segna pixel visitati (per il progresso del tracciato) */
+    const cr = COLLISION_RADIUS * dpr;
+    const cr2 = cr * cr;
     const px0 = Math.max(0, Math.floor(pt.x) - cr);
     const px1 = Math.min(canvasW - 1, Math.ceil(pt.x) + cr);
     const py0 = Math.max(0, Math.floor(pt.y) - cr);
     const py1 = Math.min(canvasH - 1, Math.ceil(pt.y) + cr);
 
-    for (let py = py0; py <= py1 && !onLine; py++) {
-      for (let px = px0; px <= px1 && !onLine; px++) {
+    for (let py = py0; py <= py1; py++) {
+      for (let px = px0; px <= px1; px++) {
         const dx = px - pt.x, dy = py - pt.y;
-        if (dx*dx + dy*dy <= cr2 && coverageMap[py * canvasW + px]) onLine = true;
-      }
-    }
-
-    if (!onLine) {
-      /* fuori linea: penalità al punteggio finale, % display si ferma */
-      offSamples++;
-    } else {
-      /* sulla linea: segna pixel visitati → % sale */
-      for (let py = py0; py <= py1; py++) {
-        for (let px = px0; px <= px1; px++) {
-          const dx = px - pt.x, dy = py - pt.y;
-          if (dx*dx + dy*dy <= cr2) {
-            const idx = py * canvasW + px;
-            if (coverageMap[idx] && !visitedMap[idx]) {
-              visitedMap[idx] = 1;
-              visitedPx++;
-            }
+        if (dx*dx + dy*dy <= cr2) {
+          const idx = py * canvasW + px;
+          if (coverageMap[idx] && !visitedMap[idx]) {
+            visitedMap[idx] = 1;
+            visitedPx++;
           }
         }
       }
     }
 
-    /* linea sempre nera */
+    /* Disegno della traccia (sempre nera, senza informazioni sulla precisione) */
     ctx.save();
     ctx.globalCompositeOperation = 'source-over';
     ctx.strokeStyle = 'rgba(8,4,20,0.80)';
@@ -340,93 +482,112 @@
 
     lastPt = pt;
 
-    /* vittoria: 100% del tracciato percorso */
-    if (visitedPx / Math.max(1, totalStPx) >= 1.0) {
+    /* Aggiorna SOLO il progresso del percorso (NON la precisione) */
+    updateProgressBar();
+
+    /* Condizione di completamento: 82% del tracciato percorso */
+    if (visitedPx / Math.max(1, totalStPx) >= 0.82) {
       wonAlready = true;
+      stopPolling();
       stopSound();
       setTimeout(showResult, 600);
     }
   }
 
-  function finalPrecision() {
-    return Math.max(0, Math.round(100 - (offSamples / Math.max(1, totalSamples) * 100)));
+  /* Aggiorna solo la barra di progresso del percorso.
+     La precisione rimane NASCOSTA durante il gioco. */
+  function updateProgressBar() {
+    const pct = Math.min(100, Math.round(visitedPx / Math.max(1, totalStPx) * 100));
+    progPctEl.textContent = pct + '%';
+    fillEl.style.width = pct + '%';
   }
 
+  /* ────────────────────────────────────────────────────
+     SCHERMATA RISULTATO
+     Rivelazione della precisione + verdetto Successo/Fallimento
+  ──────────────────────────────────────────────────── */
   function showResult() {
-    const prec = finalPrecision();
-    if (prec >= 95) {
-      /* vittoria */
-      winScore.textContent = prec + '%';
-      winEl.classList.add('show');
+    const finalPrec = Math.round(precision);
+    const isSuccess = finalPrec >= minAccuracy;
+
+    winScore.textContent = finalPrec + '%';
+
+    if (isSuccess) {
+      winTitle.textContent = 'Tatuaggio completato!';
+      winTitle.classList.remove('fail');
+      winScore.classList.remove('fail');
+      winVerdict.textContent = 'SUCCESSO';
+      winVerdict.className = 'egg-win-verdict success';
+      winSuccessB.style.display = '';
+      winFailB.style.display    = 'none';
+      retryBtn.style.display    = 'none';
     } else {
-      /* game over */
-      showGameOver(prec);
+      winTitle.textContent = 'Percorso incompleto';
+      winTitle.classList.add('fail');
+      winScore.classList.add('fail');
+      winVerdict.textContent = 'FALLIMENTO';
+      winVerdict.className = 'egg-win-verdict fail';
+      winSuccessB.style.display = 'none';
+      winFailB.style.display    = '';
+      retryBtn.style.display    = '';
     }
+
+    winEl.classList.add('show');
   }
 
-  function showGameOver(prec) {
-    const go = document.createElement('div');
-    go.id = 'egg-gameover';
-    go.innerHTML =
-      '<div class="egg-win-inner">' +
-        '<h2 class="egg-win-h" style="color:#b04040">Game Over</h2>' +
-        '<div class="egg-win-score" style="color:#b04040">' + prec + '%</div>' +
-        '<div class="egg-win-score-label">Precisione finale</div>' +
-        '<p class="egg-win-p">Troppi errori! Segui le linee viola con più precisione.<br>Riprova — puoi farcela.</p>' +
-        '<button id="egg-retry-btn">Riprova</button>' +
-        '<button id="egg-go-back-btn">Esci</button>' +
-      '</div>';
-    go.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;padding:2rem;animation:fadeIn .5s ease;';
-    document.body.appendChild(go);
-    document.getElementById('egg-retry-btn').addEventListener('click', function() {
-      window.location.reload();
-    });
-    document.getElementById('egg-go-back-btn').addEventListener('click', function() {
-      window.location.href = 'index.html';
-    });
-  }
-
-  /* ── eventi mouse (click + drag) ── */
-  canvas.addEventListener('mousedown', function(e) {
+  /* ── Pointer down ── */
+  function onDown(pt) {
+    beginGame();
     isDown = true;
-    lastPt = ptFromMouse(e);
+    lastPt = pt;
+    currentPt = pt;
     startSound();
+    startPolling();
+  }
+
+  /* ── Pointer up ── */
+  function onUp() {
+    isDown = false;
+    lastPt = null;
+    stopPolling();
+    stopSound();
+  }
+
+  /* ── Events: mouse ── */
+  canvas.addEventListener('mousedown', function(e) {
+    onDown(ptFromMouse(e));
     e.preventDefault();
   });
   canvas.addEventListener('mousemove', function(e) {
-    if (!isDown) return;
+    if (!started || !isDown) return;
     process(ptFromMouse(e));
   });
-  canvas.addEventListener('mouseup', function() {
-    isDown = false; lastPt = null; stopSound();
-  });
-  canvas.addEventListener('mouseleave', function() {
-    isDown = false; lastPt = null; stopSound();
-  });
+  canvas.addEventListener('mouseup',    onUp);
+  canvas.addEventListener('mouseleave', onUp);
 
-  /* ── eventi touch ── */
+  /* ── Events: touch ── */
   canvas.addEventListener('touchstart', function(e) {
     e.preventDefault();
-    isDown = true;
-    lastPt = ptFromTouch(e);
-    startSound();
+    onDown(ptFromTouch(e));
   }, { passive: false });
   canvas.addEventListener('touchmove', function(e) {
     e.preventDefault();
-    if (!isDown) return;
+    if (!started || !isDown) return;
     process(ptFromTouch(e));
   }, { passive: false });
-  canvas.addEventListener('touchend', function() {
-    isDown = false; lastPt = null; stopSound();
-  });
+  canvas.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    onUp();
+  }, { passive: false });
 
-  /* stile bottoni game over */
-  const s = document.createElement('style');
-  s.textContent =
-    '#egg-retry-btn,#egg-go-back-btn{margin-top:.2rem;background:none;border:1px solid #444;color:#888;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;padding:.55rem 1.6rem;cursor:pointer;border-radius:2px;transition:all .2s;font-family:var(--font);}' +
-    '#egg-retry-btn:hover{border-color:var(--accent);color:var(--text);}' +
-    '#egg-go-back-btn:hover{border-color:#b04040;color:var(--text);}';
-  document.head.appendChild(s);
+  /* ── Overlay start ── */
+  startEl.addEventListener('mousedown', function() {
+    startEl.classList.add('hide');
+  });
+  startEl.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    startEl.classList.add('hide');
+  }, { passive: false });
 
 })();
 
