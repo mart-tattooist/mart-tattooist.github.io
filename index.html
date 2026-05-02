@@ -1060,7 +1060,7 @@
 
 
 <nav>
-  <div class="nav-logo" onclick="showPage('lavori')">
+  <div class="nav-logo" onclick="showPage('tatuaggi')">
     <img src="logo.png" alt="Logo" onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block'">
     <span class="logo-fallback" style="display:none">MART</span>
   </div>
@@ -1072,7 +1072,7 @@
   </button>
 
   <ul class="nav-links" id="nav-links">
-    <li><button onclick="showPage('lavori')" id="btn-lavori" class="active">Tatuaggi</button></li>
+    <li><button onclick="showPage('tatuaggi')" id="btn-tatuaggi" class="active">Tatuaggi</button></li>
     <li><button onclick="showPage('flash')"  id="btn-flash">Flash</button></li>
     <li><button onclick="showPage('video')"  id="btn-video">Video</button></li>
     <li><button onclick="showPage('about')"  id="btn-about">Contatti</button></li>
@@ -1115,7 +1115,7 @@
 <!-- Pulsante muto globale — fuori da lb-main, non soggetto ai suoi handler -->
 <button id="lb-mute-btn" style="display:none" aria-label="Muto"></button>
 ═══════════════════════════════════════ -->
-<section class="page visible" id="page-lavori">
+<section class="page visible" id="page-tatuaggi">
   <div class="page-header">
     <h1>Tatuaggi</h1>
   </div>
@@ -1924,12 +1924,12 @@ window.addEventListener('resize', () => {
 });
 
 /* ── 4. EVENTI ── */
-const VALID_PAGES = ['lavori', 'flash', 'video', 'about'];
+const VALID_PAGES = ['tatuaggi', 'flash', 'video', 'about'];
 
 window.addEventListener('load', () => {
   /* Legge l'hash URL per ripristinare la pagina dopo un refresh */
   const hash = location.hash.replace('#', '');
-  const startPage = VALID_PAGES.includes(hash) ? hash : 'lavori';
+  const startPage = VALID_PAGES.includes(hash) ? hash : 'tatuaggi';
   showPage(startPage, false);
   history.replaceState({ page: startPage }, '', '#' + startPage);
 });
@@ -1947,7 +1947,7 @@ window.addEventListener('popstate', event => {
   const hash = location.hash.replace('#', '');
   const page = (event.state && event.state.page)
     ? event.state.page
-    : (VALID_PAGES.includes(hash) ? hash : 'lavori');
+    : (VALID_PAGES.includes(hash) ? hash : 'tatuaggi');
   showPage(page, false);
 });
 
@@ -2510,7 +2510,7 @@ document.addEventListener('gestureend',    e => e.preventDefault(), { passive: f
 /* ──────── BACK TO TOP ──────── */
 (function () {
   var btn = document.getElementById('back-to-top');
-  var SCROLL_PAGES = ['page-lavori', 'page-flash', 'page-video'];
+  var SCROLL_PAGES = ['page-tatuaggi', 'page-flash', 'page-video'];
   var NAV_H = 64;
 
   function updateBtt() {
