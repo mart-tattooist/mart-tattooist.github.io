@@ -1146,7 +1146,7 @@
     <!-- ★ PIÙ RECENTE — metti sempre qui sopra -->
 
     <div class="grid-item" 
-       data-images="dora-01.jpg,dora-02.jpg,dora-03.jpg,dora-04.jpg,dora-05.jpgdora-06.jpg" 
+       data-images="dora-01.jpg,dora-02.jpg,dora-03.jpg,dora-04.jpg,dora-05.jpg,dora-06.jpg" 
        data-caption="La Dora che fa miracoli! <br>Grazie Matteo <br>✶<br> Eseguito al @blackdahlia_tattoo <br>con le cartucce @corporospo"
        onclick="openLightbox(this)">
       <img src="dora-01.jpg" alt="Tatuaggio in stile puntinato (dotwork) del ritratto di un cane in bianco e nero su gamba con lettering Dora eseguito a Parma">
@@ -2571,6 +2571,40 @@ document.addEventListener('gestureend',    e => e.preventDefault(), { passive: f
       _origShowPage.apply(this, arguments);
     };
   }
+})();
+</script>
+
+<script>
+/* ──────── DIZIONARIO @MENZIONI ────────
+   Aggiungi qui ogni @handle con il suo URL.
+   Se la persona ha un sito, metti quello;
+   altrimenti usa il profilo Instagram.
+   ──────────────────────────────────── */
+const mentionLinks = {
+  'blackdahlia_tattoo': 'https://www.instagram.com/blackdahlia_tattoo/',
+  'corporospo':         'https://www.instagram.com/corporospo/',
+  /* aggiungi altri qui sotto: */
+  /* 'nomeutente': 'https://www.sito.it/', */
+};
+
+/* Sostituisce automaticamente @handle → link cliccabile */
+(function() {
+  const origLoadPost = window.loadPost;
+  window.loadPost = function(el) {
+    origLoadPost(el);
+    const captionEl = document.getElementById('lb-caption');
+    if (!captionEl) return;
+    captionEl.innerHTML = captionEl.innerHTML.replace(
+      /@([\w.]+)/g,
+      function(match, handle) {
+        const url = mentionLinks[handle];
+        if (!url) return match; /* handle non in lista → lascia invariato */
+        return '<a href="' + url + '" target="_blank" '
+             + 'style="color:#c9a96e;text-decoration:none;pointer-events:all">'
+             + match + '</a>';
+      }
+    );
+  };
 })();
 </script>
 </body>
