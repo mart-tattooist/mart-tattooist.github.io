@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Richiesta Appuntamento</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #333333;
+    --surface2: #cccccc;
+    --border: #444444;
+    --accent: #c9a96e;
+    --accent2: #e8c98a;
+    --text: #f0ede8;
+    --text-input: #111111;
+    --muted: #aaaaaa;
+    --error: #e07070;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(201,169,110,0.05) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 20%, rgba(201,169,110,0.03) 0%, transparent 50%);
+  }
+
+  .container {
+    width: 100%;
+    max-width: 560px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header {
+    margin-bottom: 2.5rem;
+    border-left: 2px solid var(--accent);
+    padding-left: 1.2rem;
+  }
+
+  .header h1 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+
+  .header p {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  label span.req {
+    color: var(--error);
+    margin-left: 2px;
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    background: var(--surface2);
+    border: 1px solid #bbbbbb;
+    border-radius: 7px;
+    color: var(--text-input);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    padding: 0.65rem 0.85rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 90px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23555'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 1.1rem;
+    padding-right: 2.2rem;
+  }
+
+  input[type="text"]::placeholder, textarea::placeholder { color: #888; }
+
+  input[type="text"]:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.18);
+  }
+
+  input.error, textarea.error, select.error {
+    border-color: var(--error) !important;
+    box-shadow: 0 0 0 2px rgba(224,112,112,0.2) !important;
+  }
+
+  .divider {
+    height: 1px;
+    background: #444;
+    margin: 0.25rem 0;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #bbbbbb;
+    padding-bottom: 0.25rem;
+  }
+
+  /* Bottone */
+  .btn {
+    margin-top: 0.5rem;
+    background: var(--accent);
+    color: #0f0f0f;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn:hover { background: var(--accent2); }
+  .btn:active { transform: scale(0.98); }
+  .btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+  .note {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #555;
+    margin-top: 1.2rem;
+    line-height: 1.5;
+  }
+
+  /* Success */
+  .success-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+  }
+
+  .success-overlay.show { display: flex; }
+
+  .success-box {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 14px;
+    padding: 2.5rem 2rem;
+    max-width: 360px;
+    text-align: center;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .success-box .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+  .success-box h2 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+    color: var(--accent);
+  }
+
+  .success-box p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 480px) {
+    .row-2 { grid-template-columns: 1fr; }
+    .form-card { padding: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Richiesta Appuntamento</h1>
+    <p>Compila il modulo con i dettagli del tatuaggio che vorresti realizzare.<br>Ti risponderò appena possibile.</p>
+  </div>
+
+  <div class="form-card">
+    <div class="section-label">I tuoi dati</div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Nome <span class="req">*</span></label>
+        <input type="text" id="nome" placeholder="Mario" autocomplete="given-name">
+      </div>
+      <div class="field">
+        <label>Cognome <span class="req">*</span></label>
+        <input type="text" id="cognome" placeholder="Rossi" autocomplete="family-name">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Numero di telefono <span class="req">*</span></label>
+      <input type="text" id="telefono" placeholder="333 1234567" inputmode="tel" autocomplete="tel">
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label">Il tatuaggio</div>
+
+    <div class="field">
+      <label>Idea per il tatuaggio <span class="req">*</span></label>
+      <textarea id="idea" placeholder="Descrivi il soggetto, lo stile, eventuali riferimenti..."></textarea>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Posizionamento sul corpo <span class="req">*</span></label>
+        <input type="text" id="posizionamento" placeholder="Es. avambraccio">
+      </div>
+      <div class="field">
+        <label>Dimensioni in cm (circa) <span class="req">*</span></label>
+        <input type="text" id="dimensioni" placeholder="Es. 10x15" inputmode="text">
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label">Preferenze giorno/orario</div>
+    <p style="color: var(--muted); font-size: 0.85rem; margin-top: -0.5rem;">Scegli giorno e ora: ti scriverò con le prime date libere.</p>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Giorno <span class="req">*</span></label>
+        <select id="giorno" onchange="aggiornaOrari()">
+          <option value="" disabled selected>Seleziona</option>
+          <option>Lunedì</option>
+          <option>Martedì</option>
+          <option>Mercoledì</option>
+          <option>Giovedì</option>
+          <option>Venerdì</option>
+          <option>Sabato</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Orario <span class="req">*</span></label>
+        <select id="orario" disabled>
+          <option value="" disabled selected>Seleziona prima il giorno</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn" onclick="invia()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      Invia richiesta su WhatsApp
+    </button>
+  </div>
+
+  <p class="note">Tutti i campi contrassegnati con * sono obbligatori.<br>La preferenza di giorno/orario verrà confermata dallo studio.</p>
+</div>
+
+<!-- Success overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="icon">✅</div>
+    <h2>Quasi fatto!</h2>
+    <p>Si aprirà WhatsApp con i tuoi dati precompilati.<br>Premi <strong>Invia</strong> per completare la trasmissione.</p>
+  </div>
+</div>
+
+<script>
+  function generaFasce(inizio, fine) {
+    const orari = [];
+    let [h, m] = inizio.split(':').map(Number);
+    const [hFine, mFine] = fine.split(':').map(Number);
+    while (h < hFine || (h === hFine && m <= mFine)) {
+      orari.push(String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0'));
+      m += 30;
+      if (m >= 60) { m -= 60; h += 1; }
+    }
+    return orari;
+  }
+
+  function aggiornaOrari() {
+    const giorno = document.getElementById('giorno').value;
+    const orarioSel = document.getElementById('orario');
+    const giorniFeriali = ['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì'];
+
+    let fasce = [];
+    if (giorniFeriali.includes(giorno)) {
+      fasce = generaFasce('14:30', '19:00');
+    } else if (giorno === 'Sabato') {
+      fasce = generaFasce('08:30', '13:00');
+    }
+
+    orarioSel.innerHTML = '<option value="" disabled selected>Seleziona</option>' +
+      fasce.map(o => `<option>${o}</option>`).join('');
+    orarioSel.disabled = fasce.length === 0;
+    orarioSel.classList.remove('error');
+  }
+
+  function invia() {
+    const campi = ['nome', 'cognome', 'telefono', 'idea', 'posizionamento', 'dimensioni', 'giorno', 'orario'];
+
+    let valido = true;
+
+    campi.forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('error');
+      if (!el.value.trim()) { el.classList.add('error'); valido = false; }
+    });
+
+    if (!valido) {
+      alert('Per favore compila tutti i campi obbligatori.');
+      return;
+    }
+
+    const msg =
+`📅 *RICHIESTA APPUNTAMENTO TATUAGGIO*
+
+👤 *Dati cliente*
+• Nome: ${document.getElementById('nome').value.trim()}
+• Cognome: ${document.getElementById('cognome').value.trim()}
+• Telefono: ${document.getElementById('telefono').value.trim()}
+
+🎨 *Dettagli tatuaggio*
+• Idea: ${document.getElementById('idea').value.trim()}
+• Posizionamento: ${document.getElementById('posizionamento').value.trim()}
+• Dimensioni (circa): ${document.getElementById('dimensioni').value.trim()} cm
+
+🗓️ *Preferenza giorno/orario*
+• ${document.getElementById('giorno').value} ore ${document.getElementById('orario').value}`;
+
+    document.getElementById('successOverlay').classList.add('show');
+    setTimeout(() => {
+      const numero = '393400799434';
+      window.open(`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`, '_blank');
+      setTimeout(() => document.getElementById('successOverlay').classList.remove('show'), 3000);
+    }, 600);
+  }
+</script>
+</body>
+</html>
