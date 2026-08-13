@@ -2712,5 +2712,72 @@ const mentionLinks = {
   };
 })();
 </script>
+
+<!-- BANNER COOKIE GDPR -->
+<div id="cookie-banner" style="
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #111111;
+  color: #ffffff;
+  padding: 15px 20px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+  z-index: 999999;
+  font-family: sans-serif;
+  font-size: 14px;
+  box-sizing: border-box;
+">
+  <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px;">
+    
+    <p style="margin: 0; flex: 1 1 300px; line-height: 1.4;">
+      Questo sito utilizza cookie tecnici e strumenti di terze parti (come Google Maps) per migliorare la tua esperienza di navigazione. Puoi scegliere se accettarli o proseguire senza.
+    </p>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <button id="btn-reject-cookie" style="
+        background: transparent;
+        color: #ffffff;
+        border: 1px solid #ffffff;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+      ">Solo necessari</button>
+      <button id="btn-accept-cookie" style="
+        background: #ffffff;
+        color: #000000;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 13px;
+      ">Accetta tutti</button>
+    </div>
+  </div>
+</div>
+<script>
+  (function() {
+    // Verifica se l'utente ha già salvato la preferenza
+    var cookieConsent = localStorage.getItem('cookie_consent_mart_tattoo');
+    var banner = document.getElementById('cookie-banner');
+    if (!cookieConsent) {
+      banner.style.display = 'block';
+    }
+    // Se clicca Accetta
+    document.getElementById('btn-accept-cookie').addEventListener('click', function() {
+      localStorage.setItem('cookie_consent_mart_tattoo', 'accepted');
+      banner.style.display = 'none';
+      // Qui in futuro puoi attivare eventuali script di tracciamento
+    });
+    // Se clicca Rifiuta / Solo necessari
+    document.getElementById('btn-reject-cookie').addEventListener('click', function() {
+      localStorage.setItem('cookie_consent_mart_tattoo', 'rejected');
+      banner.style.display = 'none';
+    });
+  })();
+</script>
+<!-- FINE BANNER COOKIE GDPR -->
 </body>
 </html>
