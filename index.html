@@ -2563,8 +2563,11 @@ document.addEventListener('contextmenu', e => e.preventDefault(), false);
   }
 
   function waitForImages() {
-    /* Prende tutte le <img> della pagina eccetto quella del logo nella splash */
-    var imgs = Array.prototype.slice.call(document.querySelectorAll('img:not(#splash img)'));
+    /* Prende solo le <img> davvero visibili all'avvio: navbar + pagina iniziale.
+       Le immagini nelle pagine nascoste (Flash/Video/Chi sono) sono in loading="lazy"
+       e il browser non le scarica finché non diventano visibili: aspettarle qui
+       avrebbe bloccato lo splash screen indefinitamente. */
+    var imgs = Array.prototype.slice.call(document.querySelectorAll('.nav-logo img, .page.visible img'));
     if (imgs.length === 0) { hideSplash(); return; }
 
     var total = imgs.length;
@@ -2603,9 +2606,12 @@ document.addEventListener('gestureend',    e => e.preventDefault(), { passive: f
 
 </script>
 <script>
-  /* ── FADE-IN SIMULTANEO: tutte le immagini di una pagina appaiono insieme ──
-     Raccoglie tutte le img della pagina, aspetta che siano tutte pronte,
-     poi aggiunge 'loaded' a tutte in una volta sola → stesso identico fade. */
+  /* ── FADE-IN PER IMMAGINE ──
+     Ogni immagine appare (fade-in) appena è pronta, invece di aspettare
+     che TUTTE le immagini della pagina siano pronte. Con loading="lazy" le
+     immagini fuori schermo si scaricano solo quando l'utente scorre vicino:
+     aspettarle tutte prima di mostrarne anche solo una avrebbe lasciato la
+     pagina invisibile finché non si scorreva fino in fondo. */
   function fadeInPageImages(pageEl) {
     if (!pageEl) return;
 
@@ -2620,23 +2626,12 @@ document.addEventListener('gestureend',    e => e.preventDefault(), { passive: f
     /* Forza il browser a registrare il reset prima di avviare la transizione */
     void pageEl.offsetWidth;
 
-    var total = imgs.length;
-    var done  = 0;
-
-    function onSettled() {
-      done++;
-      if (done >= total) {
-        /* Tutte pronte → fade-in simultaneo con la stessa transizione CSS */
-        imgs.forEach(function(img) { img.classList.add('loaded'); });
-      }
-    }
-
     imgs.forEach(function(img) {
       if (img.complete && img.naturalWidth > 0) {
-        onSettled();
+        img.classList.add('loaded');
       } else {
-        img.addEventListener('load',  onSettled, { once: true });
-        img.addEventListener('error', onSettled, { once: true });
+        img.addEventListener('load',  function() { img.classList.add('loaded'); }, { once: true });
+        img.addEventListener('error', function() { img.classList.add('loaded'); }, { once: true });
       }
     });
   }
