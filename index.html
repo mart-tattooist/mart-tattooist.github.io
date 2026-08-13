@@ -2720,39 +2720,55 @@ const mentionLinks = {
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: #111111;
-  color: #ffffff;
-  padding: 15px 20px;
+  background-color: rgba(15,15,15,0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #888888;
+  padding: 15px 40px 15px 20px;
   box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
   z-index: 999999;
-  font-family: sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   box-sizing: border-box;
 ">
+  <button id="btn-close-cookie" aria-label="Chiudi" style="
+    position: absolute;
+    top: 8px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: #888888;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+  ">&times;</button>
   <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px;">
     
-    <p style="margin: 0; flex: 1 1 300px; line-height: 1.4;">
-      Questo sito utilizza cookie tecnici e strumenti di terze parti (come Google Maps) per migliorare la tua esperienza di navigazione. Puoi scegliere se accettarli o proseguire senza.
+    <p style="margin: 0; flex: 1 1 300px; line-height: 1.4; color: #888888;">
+      Questo sito utilizza cookie tecnici necessari al corretto funzionamento e strumenti per migliorare la tua esperienza di navigazione. Puoi scegliere di accettare tutti i cookie o proseguire solo con quelli necessari.
     </p>
     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
       <button id="btn-reject-cookie" style="
         background: transparent;
-        color: #ffffff;
-        border: 1px solid #ffffff;
+        color: #888888;
+        border: 1px solid #888888;
         padding: 8px 16px;
         border-radius: 4px;
         cursor: pointer;
         font-size: 13px;
+        font-family: 'DM Sans', sans-serif;
       ">Solo necessari</button>
       <button id="btn-accept-cookie" style="
-        background: #ffffff;
-        color: #000000;
+        background: #888888;
+        color: #111111;
         border: none;
         padding: 8px 16px;
         border-radius: 4px;
         font-weight: bold;
         cursor: pointer;
         font-size: 13px;
+        font-family: 'DM Sans', sans-serif;
       ">Accetta tutti</button>
     </div>
   </div>
@@ -2774,6 +2790,10 @@ const mentionLinks = {
     // Se clicca Rifiuta / Solo necessari
     document.getElementById('btn-reject-cookie').addEventListener('click', function() {
       localStorage.setItem('cookie_consent_mart_tattoo', 'rejected');
+      banner.style.display = 'none';
+    });
+    // Se clicca la "x": chiude senza salvare la preferenza, ricomparirà al prossimo caricamento
+    document.getElementById('btn-close-cookie').addEventListener('click', function() {
       banner.style.display = 'none';
     });
   })();
