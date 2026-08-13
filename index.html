@@ -166,6 +166,31 @@
     .nav-links button:hover::after,
     .nav-links button.active::after { width: 100%; }
 
+    .nav-links a.nav-book {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-family: var(--font);
+      font-weight: 400;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.22s;
+      padding: 0.2rem 0;
+      position: relative;
+    }
+    .nav-links a.nav-book::after {
+      content: ''; position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width 0.28s ease;
+    }
+    .nav-links a.nav-book:hover { color: var(--accent2, var(--accent)); }
+    .nav-links a.nav-book:hover::after { width: 100%; }
+
     /* ──────── PAGINE ──────── */
     .page { display: none; padding-top: 64px; min-height: 100vh; }
     .page.visible { display: block; animation: fadeIn 0.35s ease; }
@@ -897,6 +922,7 @@
       }
       .nav-links.mobile-open { display: flex; } /* Mostra al clic */
       .nav-links button { width: 100%; padding: 1.2rem 2rem; text-align: left; }
+      .nav-links a.nav-book { width: 100%; padding: 1.2rem 2rem; text-align: left; display: block; }
     }
 
     /* ══════════════════════════════════════════
@@ -1076,6 +1102,7 @@
     <li><button onclick="showPage('flash')"  id="btn-flash">Flash</button></li>
     <li><button onclick="showPage('video')"  id="btn-video">Video</button></li>
     <li><button onclick="showPage('about')"  id="btn-about">Contatti</button></li>
+    <li><a href="richiesta_appuntamento.html" class="nav-book" target="_blank" rel="noopener">Prenota ora</a></li>
   </ul>
 </nav>
 
